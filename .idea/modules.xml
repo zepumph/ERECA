@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/ERECA.iml" filepath="$PROJECT_DIR$/ERECA.iml" />
+      <module fileurl="file://$PROJECT_DIR$/Ereca_Main.iml" filepath="$PROJECT_DIR$/Ereca_Main.iml" />
       <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" />
     </modules>
   </component>

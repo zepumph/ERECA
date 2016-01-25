@@ -2,8 +2,15 @@ package michael.mobilecomputing.com.ereca;
 
 
 
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.location.Address;
+import android.location.Geocoder;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.speech.RecognizerIntent;
@@ -25,20 +32,28 @@ public class MainActivity extends AppCompatActivity {
 
     EditText noteBody;
     ImageView picTaken;
+    LocationManager locationManager;
+    double longitude;
+    double latitude;
+    boolean locationRequested = false;
+    Address address;
+    Geocoder geocoder;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        geocoder = new Geocoder(getApplicationContext());
+
 
         noteBody = (EditText) findViewById(R.id.et_notepad);
         picTaken = (ImageView) findViewById(R.id.iv_pic_taken);
 
     }
     public void takePicture(View view){
-        Intent i = new Intent();
+        Intent i = new Intent(this, CameraActivity.class);
 
-        i.setAction(MediaStore.ACTION_IMAGE_CAPTURE);
         startActivityForResult(i, TAKE_PICTURE_ID);
     }
     public void insertSpeech(View view){
@@ -46,6 +61,80 @@ public class MainActivity extends AppCompatActivity {
 
         i.setAction(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
         startActivityForResult(i, SPEECH_INPUT_ID);
+    }
+
+    private void getLocality(Location location){
+        if(location != null){
+            longitude = location.getLongitude();
+            latitude = location.getLatitude();
+            try{
+                address = (Address) geocoder.getFromLocation(latitude, longitude, 1).toArray()[0];
+                String locality = address.getSubAdminArea();
+                if (locality == null) {
+                    locality = address.getLocality();
+                }
+
+                if (locality == null){
+                    locality = address.getSubAdminArea();
+                }
+                if (locality == null) {
+                    locality = address.getAddressLine(0);
+                }
+                Toast t = Toast.makeText(getApplicationContext(), locality, Toast.LENGTH_LONG);
+            t.show();
+            }
+            catch (Exception e) {
+                System.out.println(e);
+//            }
+//            longitude = location.getLongitude();
+//            latitude = location.getLatitude();
+//            Toast t = Toast.makeText(getApplicationContext(),
+//                    String.format("long: " + longitude + "\nlat: " + latitude), Toast.LENGTH_LONG);
+//            t.show();
+            }
+        }
+        else{
+            Toast t = Toast.makeText(getApplicationContext(), "NO LAST LOCATION", Toast.LENGTH_SHORT);
+            t.show();
+            
+        }
+
+    }
+
+    public void getLocation(View view) {
+        locationRequested = true;
+        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        try{
+            Location lastLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+            getLocality(lastLocation);
+        }
+        catch (SecurityException e){
+            System.out.print(e);
+        }
+        LocationListener locationListener = new LocationListener() {
+            public void onLocationChanged(Location location) {
+                getLocality(location);
+            }
+
+            @Override
+            public void onProviderDisabled(String provider) {
+            }
+
+            @Override
+            public void onProviderEnabled(String provider) {
+            }
+
+            @Override
+            public void onStatusChanged(String provider, int status, Bundle extras) {
+            }
+        };
+
+        try{
+            locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 10, locationListener);
+        }
+        catch (SecurityException e){
+            System.out.print(e);
+        }
     }
 
     @Override
@@ -59,8 +148,10 @@ public class MainActivity extends AppCompatActivity {
         }
         else if( requestCode == TAKE_PICTURE_ID && resultCode == RESULT_OK){
             Bundle extras = data.getExtras();
-            Bitmap bm = (Bitmap) extras.get("data");
-            picTaken.setImageBitmap(bm);
+            String fileName = extras.getString("FILE_PATH");
+            System.out.println(fileName);
+            Bitmap bitmapToDisplayFromSDCard = BitmapFactory.decodeFile(fileName);
+            picTaken.setImageBitmap(bitmapToDisplayFromSDCard);
         }
     }
 
