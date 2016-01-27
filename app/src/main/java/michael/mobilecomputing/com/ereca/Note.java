@@ -1,7 +1,12 @@
 package michael.mobilecomputing.com.ereca;
 
 import android.graphics.Bitmap;
-import android.location.Location;
+import android.util.Log;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.io.ByteArrayOutputStream;
 
 /**
  * Created by Michael on 1/25/2016.
@@ -9,47 +14,79 @@ import android.location.Location;
 
 
 /**
- *  Not yet implemented yet
+ *
  *  Waiting for a rework of the ui organization
  *  Jack and Rebecca: Currently working on one button note taking.
  *  This POJO is to be used for holding a new note once collection occurs in one step.
- *   **** Michael, 3:45 1/25/16
  */
 
 public class Note {
+    private static final String ERROR = "ERROR";
 
-    private Location location;
+
+    private String user;
     private String noteText;
+    private double lon;
+    private double lat;
     private Bitmap image;
+    private int date;
 
 
-    public Note(Location location, String noteText, Bitmap image) {
-        this.location = location;
+    public Note(String user, String noteText, double lon, double lat, Bitmap image, int date) {
+        this.user = user;
         this.noteText = noteText;
+        this.lon = lon;
+        this.lat = lat;
         this.image = image;
+        this.date = date;
     }
 
-    public Bitmap getImage() {
-        return image;
-    }
-
-    public void setImage(Bitmap image) {
-        this.image = image;
+    public String getUser() {
+        return user;
     }
 
     public String getNoteText() {
         return noteText;
     }
 
-    public void setNoteText(String noteText) {
-        this.noteText = noteText;
+    public double getLongitude() {
+        return lon;
     }
 
-    public Location getLocation() {
-        return location;
+    public double getLatitude() {
+        return lat;
     }
 
-    public void setLocation(Location location) {
-        this.location = location;
+    public Bitmap getImage() {
+        return image;
+    }
+
+    public int getDate() {
+        return date;
+    }
+
+
+
+    public String jsonify(){
+        try{
+            JSONObject json = new JSONObject();
+            json.put("user", user);
+            json.put("noteText", noteText);
+            json.put("lon", lon);
+            json.put("lat", lat);
+          //  json.put("image", bitMapToByteArray(image));
+            json.put("date", date);
+
+            return json.toString();
+        }catch(JSONException e){
+            Log.e(ERROR, "JSON exception: " + e.getMessage(), e);
+        }
+        return "{ error:'jsonify failed in Note.java'}";
+    }
+
+    public byte[] bitMapToByteArray(Bitmap bmp){
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        bmp.compress(Bitmap.CompressFormat.PNG, 100, stream);
+        return stream.toByteArray();
     }
 }
