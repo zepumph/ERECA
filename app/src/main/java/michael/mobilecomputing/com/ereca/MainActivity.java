@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -42,6 +43,7 @@ public class MainActivity extends AppCompatActivity {
 
     private static final int SPEECH_INPUT_ID = 3500;
     private static final int TAKE_PICTURE_ID = 3501;
+    private static final String DEBUG = "DEBUG";
 
     EditText noteBody;
     ImageView picTaken;
@@ -167,28 +169,32 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-
-    public Note getNote() {
-        return note;
-    }
-
-    public void updateNote(){
+    public void updateNote() {
         Calendar c = Calendar.getInstance();
         int d = c.get(Calendar.SECOND);
-        note = new Note("michael",noteBody.getText().toString(),
-                longitude, latitude, picTaken.getDrawingCache(),
+        note = new Note("michael", noteBody.getText().toString(),
+                longitude, latitude, ((BitmapDrawable) picTaken.getDrawable()).getBitmap(),
                 d);
     }
 
+    // Set up as a an onclick listener to a 'save' button or something like that.
+    // Currently not initiated with anything
     public void sendNote(View view) {
-
         //Temporality needed to load the note object from other members
         updateNote();
+
+        final String urlText = "http://cs.coloradocollege.edu/~cp341mobile/cgi-bin/notes.cgi";
+        final String reqMeth = "POST";
+        final String noteJSON = note.jsonify();
+        final String action = "addNote";
+
 
         ConnectivityManager connMgr = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
 
-        String[] params = {"POST", note.jsonify(), "addNote"};
+        Log.d(DEBUG, "JSON NOTE:  " + noteJSON);
+
+        String[] params = {reqMeth, noteJSON, action, urlText};
         if (networkInfo != null && networkInfo.isConnected()) {
             new HTTPHelper().execute(params);
         } else {
@@ -198,26 +204,23 @@ public class MainActivity extends AppCompatActivity {
     }
 
 
-
     /**
      * Created by Michael on 1/26/2016.
      * Much of this code was gathered from Android tutorials and adapted for the full project.
      * See http://developer.android.com/training/basics/network-ops/connecting.html
-     *
+     * <p/>
      * This class in embedded inside of the Main Activity class because it relies on the context of
      * the application.
-     *
+     * <p/>
      * the params object holds all data needing to be sent to the server:
-     *
-     *  request method,
-     *  query value of 'action', options: addNote, addUser, getUser (retrieves all the notes),
-     *  jsonified note object
-     *
-     *
+     * <p/>
+     * 0  request method,
+     * 1  jsonified note object
+     * 2  query value of 'action', options: addNote, addUser, getUser (retrieves all the notes),
+     * 3  the URL of the cgi script, no query params needed
      */
     class HTTPHelper extends AsyncTask<String, Void, String> {
         private static final String DEBUG = "DEBUG";
-        private static final String urlText = "http://cs.coloradocollege.edu/~cp341mobile?action=";
 
         @Override
         protected String doInBackground(String... params) {
@@ -233,20 +236,21 @@ public class MainActivity extends AppCompatActivity {
         // onPostExecute displays the results of the AsyncTask.
         @Override
         protected void onPostExecute(String result) {
-//            Toast t = Toast.makeText(getApplicationContext(), result, Toast.LENGTH_LONG);
-//            t.show();
+            Toast t = Toast.makeText(getApplicationContext(), result, Toast.LENGTH_LONG);
+            t.show();
         }
 
 
-        private String sendHTTP(  String[] params ) throws IOException {
+        private String sendHTTP(String[] params) throws IOException {
             String method = params[0];
             String noteJSON = params[1];
             String action = params[2];
+            String urlText = params[3];
 
             InputStream is = null;
 
             try {
-                URL url = new URL(urlText + action);
+                URL url = new URL(urlText + "?action=" + action);
 
                 HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 
@@ -255,6 +259,7 @@ public class MainActivity extends AppCompatActivity {
                 conn.setRequestProperty("Content-type", "application/json");
                 conn.setRequestMethod(method);
                 conn.setDoInput(true);
+                conn.setDoOutput(true);
 
                 //set the body of the http request
                 DataOutputStream dos = new DataOutputStream(conn.getOutputStream());
@@ -276,7 +281,12 @@ public class MainActivity extends AppCompatActivity {
 
                 // Makes sure that the InputStream is closed after the app is
                 // finished using it.
-            } finally {
+            }
+            catch(IOException e){
+                Log.d(DEBUG, "CONNECTION PROBLEMS" + e.getMessage(), e);
+                return "Exception Caught";
+            }
+            finally {
                 if (is != null) {
                     is.close();
                 }
@@ -289,7 +299,9 @@ public class MainActivity extends AppCompatActivity {
             reader = new InputStreamReader(stream, "UTF-8");
             char[] buffer = new char[len];
             reader.read(buffer);
-            return new String(buffer);
+            String s =  new String(buffer);
+            Log.d(DEBUG, "RESPONSE STRING: " + s);
+            return s;
         }
     }
 }

@@ -1,6 +1,7 @@
 package michael.mobilecomputing.com.ereca;
 
 import android.graphics.Bitmap;
+import android.os.Debug;
 import android.util.Log;
 
 import org.json.JSONException;
@@ -22,6 +23,7 @@ import java.io.ByteArrayOutputStream;
 
 public class Note {
     private static final String ERROR = "ERROR";
+    private static final String DEBUG = "DEBUG";
 
 
     private String user;
@@ -67,21 +69,38 @@ public class Note {
 
 
 
+    //Creates a json of the file
     public String jsonify(){
         try{
             JSONObject json = new JSONObject();
-            json.put("user", user);
-            json.put("noteText", noteText);
-            json.put("lon", lon);
-            json.put("lat", lat);
-          //  json.put("image", bitMapToByteArray(image));
-            json.put("date", date);
+            json = putValue(json, "user", user);
+            json = putValue(json, "noteText", noteText);
+            json = putValue(json, "lat", lat);
+            json = putValue(json, "lon", lon);
+            json = putValue(json, "image", image);
+            json = putValue(json, "date", date);
 
+            Log.d(DEBUG, "JSONED Item: " + json.toString() );
             return json.toString();
         }catch(JSONException e){
             Log.e(ERROR, "JSON exception: " + e.getMessage(), e);
         }
         return "{ error:'jsonify failed in Note.java'}";
+    }
+
+    public JSONObject putValue(JSONObject json, String field, Object value) throws JSONException{
+        if (value == null){
+            return json.put(field, false   );
+        }
+        else {
+            // Load the json with bytes of the img to be stored.
+            if( value instanceof Bitmap){
+                byte[] bytes = bitMapToByteArray((Bitmap)value);
+                return json.put(field, bytes);
+
+            }
+            return json.put(field, value);
+        }
     }
 
     public byte[] bitMapToByteArray(Bitmap bmp){
