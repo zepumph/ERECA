@@ -4,9 +4,12 @@ package michael.mobilecomputing.com.ereca;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
 import android.graphics.drawable.BitmapDrawable;
+import android.hardware.Camera;
 import android.location.Address;
 import android.location.Geocoder;
 import android.location.Location;
@@ -16,15 +19,22 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Environment;
 import android.speech.RecognizerIntent;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.KeyEvent;
+import android.view.Surface;
 import android.view.View;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.Toast;
 
 import java.io.DataOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -44,7 +54,12 @@ public class MainActivity extends AppCompatActivity {
     private static final int SPEECH_INPUT_ID = 3500;
     private static final int TAKE_PICTURE_ID = 3501;
     private static final String DEBUG = "DEBUG";
-
+    private Camera myCamera = null;
+    private Preview preview;
+    public static final int MEDIA_TYPE_IMAGE = 1;
+    Bitmap bitmapToDisplay;
+    String locality;
+    File pictureFile;
     EditText noteBody;
     ImageView picTaken;
     LocationManager locationManager;
@@ -66,16 +81,141 @@ public class MainActivity extends AppCompatActivity {
 
         noteBody = (EditText) findViewById(R.id.et_notepad);
         picTaken = (ImageView) findViewById(R.id.iv_pic_taken);
+        //added in getLocation() to onCreate
+        getLocation();
+        //Camera
+        if (checkCameraHardware(this)) {
 
+            try {
+                myCamera = Camera.open();
+                Camera.Parameters params = myCamera.getParameters();
+                myCamera.setParameters(params);
+                myCamera.setDisplayOrientation(90);
+                preview = new Preview(this, myCamera);
+                FrameLayout cameraPreview = (FrameLayout) findViewById(R.id.preview);
+                cameraPreview.addView(preview);
+                System.out.println("camera opened");
+            } catch (Exception e) {
+                System.out.println("Error e: " + e);
+            }
+        }
+    }
+    //ADDED BY JACK ALL CAMERA CODE IS TAKEN FROM THE CAMERA TUTORIAL FROM ANDROID DOCS
+    //http://developer.android.com/guide/topics/media/camera.html
+    @Override
+    protected void onStop() {
+        super.onStop();
+        //myCamera.release();
+    }
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        myCamera.release();
+    }
+    @Override
+    public boolean dispatchKeyEvent(KeyEvent event) {
+        int action = event.getAction();
+        int keyCode = event.getKeyCode();
+        switch (keyCode) {
+            case KeyEvent.KEYCODE_VOLUME_UP:
+                if (action == KeyEvent.ACTION_DOWN) {
+                    //TODO
+                }
+                return true;
+            case KeyEvent.KEYCODE_VOLUME_DOWN:
+                if (action == KeyEvent.ACTION_DOWN) {
+                    takePicture();
+                    insertSpeech();
+                    Toast t = Toast.makeText(getApplicationContext(), "latitude" + String.valueOf(latitude) + " " + "Longitude" + String.valueOf(longitude), Toast.LENGTH_LONG);
+                    t.show();
+                    Date date = new Date();
+                    //new note stores all info on new note
+                    Note newNote = new Note("testUser", noteBody.getText().toString(), longitude, latitude, bitmapToDisplay, (int)date.getTime());
+                }
+                return true;
+            default:
+                return super.dispatchKeyEvent(event);
+        }
     }
 
-    public void takePicture(View view) {
-        Intent i = new Intent(this, CameraActivity.class);
-
-        startActivityForResult(i, TAKE_PICTURE_ID);
+    private boolean checkCameraHardware(Context context) {
+        if (context.getPackageManager().hasSystemFeature(
+                PackageManager.FEATURE_CAMERA)) {
+            // this device has a camera
+            return true;
+        } else {
+            // no camera on this device
+            return false;
+        }
     }
+    Camera.PictureCallback mPicture = new Camera.PictureCallback() {
 
-    public void insertSpeech(View view) {
+        @Override
+        public void onPictureTaken(byte[] data, Camera camera) {
+            Log.d("onPictureTaken", "entering picture callback");
+
+            pictureFile = getOutputMediaFile(MEDIA_TYPE_IMAGE);
+            if (pictureFile == null){
+                Log.d("onPictureTaken", "Error creating media file, check storage permissions: ");
+                return;
+            }
+
+            try {
+                FileOutputStream fos = new FileOutputStream(pictureFile);
+
+                fos.write(data);
+                fos.close();
+                Log.d("onPictureTaken", "successfully created file ");
+
+            } catch (FileNotFoundException e) {
+                Log.d("onPictureTaken", "File not found: " + e.getMessage());
+            } catch (IOException e) {
+                Log.d("onPictureTaken", "Error accessing file: " + e.getMessage());
+            }
+            //picTaken.refreshDrawableState();
+            Bitmap picBitmap = BitmapFactory.decodeFile(pictureFile.getPath());
+            Matrix matrix = new Matrix();
+            matrix.postRotate(90);
+            bitmapToDisplay = Bitmap.createBitmap(picBitmap , 0, 0, picBitmap.getWidth(), picBitmap.getHeight(), matrix, true);
+            //myCamera.stopPreview();
+
+            picTaken.setImageBitmap(bitmapToDisplay);
+
+            myCamera.startPreview();
+
+        }
+    };
+
+    private static File getOutputMediaFile(int type) {
+        File mediaStorageDir = new File(Environment.getExternalStoragePublicDirectory(
+                Environment.DIRECTORY_PICTURES), "MyCameraApp");
+
+
+        // Create the storage directory if it does not exist
+        if (!mediaStorageDir.exists()) {
+            if (!mediaStorageDir.mkdirs()) {
+                Log.d("ERECA", "failed to create directory");
+                return null;
+            }
+        }
+        // Create a media file name
+        String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        File mediaFile;
+        if (type == MEDIA_TYPE_IMAGE){
+            String fileName = mediaStorageDir.getPath() + File.separator +
+                    "IMG" + timeStamp + ".jpg";
+            mediaFile = new File(fileName);
+        } else {
+            return null;
+        }
+
+        return mediaFile;
+    }
+    public void takePicture(){
+        myCamera.takePicture(null, null, mPicture);
+
+    }
+    public void insertSpeech() {
         Intent i = new Intent();
 
         i.setAction(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
@@ -88,7 +228,7 @@ public class MainActivity extends AppCompatActivity {
             latitude = location.getLatitude();
             try {
                 address = (Address) geocoder.getFromLocation(latitude, longitude, 1).toArray()[0];
-                String locality = address.getSubAdminArea();
+                locality = address.getSubAdminArea();
                 if (locality == null) {
                     locality = address.getLocality();
                 }
@@ -118,7 +258,7 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    public void getLocation(View view) {
+    public void getLocation() {//took out View view as input, seemed unnecessary
         locationRequested = true;
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
         try {

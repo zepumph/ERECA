@@ -11,7 +11,11 @@
     tools:context="mobilecomputing.com.ereca.MainActivity"
     android:orientation="vertical">
 
+    <FrameLayout android:id="@+id/preview"
+        android:layout_weight="1" android:layout_width="1px"
+        android:layout_height="1px">
 
+    </FrameLayout>
     <EditText
         android:id="@+id/et_notepad"
         android:hint="@string/et_hint"
