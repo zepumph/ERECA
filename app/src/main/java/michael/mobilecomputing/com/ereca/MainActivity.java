@@ -70,14 +70,17 @@ public class MainActivity extends AppCompatActivity {
     Geocoder geocoder;
 
     Note note;
+    String user;
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        geocoder = new Geocoder(getApplicationContext());
+//        geocoder = new Geocoder(getApplicationContext());
 
+        // sets the username from the login NFC activity.
+        setUser();
 
         noteBody = (EditText) findViewById(R.id.et_notepad);
         picTaken = (ImageView) findViewById(R.id.iv_pic_taken);
@@ -102,6 +105,19 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
+    public void setUser() {
+        Bundle extras = getIntent().getExtras();
+        if (extras != null) {
+            user = extras.getString("USERNAME");
+        }
+        else{
+            user = "Generic, Lame, User.";
+        }
+        Toast t = Toast.makeText(getApplicationContext(),"USERNAME: " + user, Toast.LENGTH_LONG);
+        t.show();
+    }
+
+
     //ADDED BY JACK ALL CAMERA CODE IS TAKEN FROM THE CAMERA TUTORIAL FROM ANDROID DOCS
     //http://developer.android.com/guide/topics/media/camera.html
     @Override
@@ -132,7 +148,7 @@ public class MainActivity extends AppCompatActivity {
                     t.show();
                     Date date = new Date();
                     //new note stores all info on new note
-                    note = new Note("testUser", noteBody.getText().toString(), longitude, latitude, image, (int)date.getTime());
+                    note = new Note(user, noteBody.getText().toString(), longitude, latitude, image, (int)date.getTime());
                 }
                 return true;
             default:

@@ -101,6 +101,11 @@ public class LoginActivity extends Activity{
         Toast t = Toast.makeText(getApplicationContext(),"Message: " + s, Toast.LENGTH_LONG);
         t.show();
 
+        Intent i = new Intent(getBaseContext(), MainActivity.class);
+        i.putExtra("USERNAME", s);
+        startActivity(i);
+
+
          //the idea
          /**
           * Someone is logged in already

@@ -7,4 +7,7 @@
     <string name="take_picture">Take Picture</string>
     <string name="btn_save">Save</string>
     <string name="title_activity_camera">CameraActivity</string>
+    <string name="enter_username">Enter Username Manually</string>
+    <string name="or">OR</string>
+    <string name="nfc_login">Please Use NFC to Login</string>
 </resources>

@@ -47,7 +47,7 @@ public class Note {
         return user;
     }
     
-    public String setUser(String currentUser) {
+    public void setUser(String currentUser) {
         this.user = currentUser;
     }
 
