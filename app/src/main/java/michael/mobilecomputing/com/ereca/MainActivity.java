@@ -8,7 +8,6 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
-import android.graphics.drawable.BitmapDrawable;
 import android.hardware.Camera;
 import android.location.Address;
 import android.location.Geocoder;
@@ -24,7 +23,6 @@ import android.speech.RecognizerIntent;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.KeyEvent;
-import android.view.Surface;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.FrameLayout;
@@ -43,10 +41,8 @@ import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Date;
 
 public class MainActivity extends AppCompatActivity {
@@ -54,10 +50,14 @@ public class MainActivity extends AppCompatActivity {
     private static final int SPEECH_INPUT_ID = 3500;
     private static final int TAKE_PICTURE_ID = 3501;
     private static final String DEBUG = "DEBUG";
+    private static final String ERROR = "ERROR";
     private Camera myCamera = null;
     private Preview preview;
     public static final int MEDIA_TYPE_IMAGE = 1;
-    Bitmap bitmapToDisplay;
+
+
+
+    Bitmap image;
     String locality;
     File pictureFile;
     EditText noteBody;
@@ -66,7 +66,7 @@ public class MainActivity extends AppCompatActivity {
     double longitude;
     double latitude;
     boolean locationRequested = false;
-    Address address;
+    //Address address;
     Geocoder geocoder;
 
     Note note;
@@ -81,6 +81,8 @@ public class MainActivity extends AppCompatActivity {
 
         noteBody = (EditText) findViewById(R.id.et_notepad);
         picTaken = (ImageView) findViewById(R.id.iv_pic_taken);
+
+        locationManager = null;
         //added in getLocation() to onCreate
         getLocation();
         //Camera
@@ -130,7 +132,7 @@ public class MainActivity extends AppCompatActivity {
                     t.show();
                     Date date = new Date();
                     //new note stores all info on new note
-                    Note newNote = new Note("testUser", noteBody.getText().toString(), longitude, latitude, bitmapToDisplay, (int)date.getTime());
+                    note = new Note("testUser", noteBody.getText().toString(), longitude, latitude, image, (int)date.getTime());
                 }
                 return true;
             default:
@@ -176,10 +178,10 @@ public class MainActivity extends AppCompatActivity {
             Bitmap picBitmap = BitmapFactory.decodeFile(pictureFile.getPath());
             Matrix matrix = new Matrix();
             matrix.postRotate(90);
-            bitmapToDisplay = Bitmap.createBitmap(picBitmap , 0, 0, picBitmap.getWidth(), picBitmap.getHeight(), matrix, true);
+            image = Bitmap.createBitmap(picBitmap , 0, 0, picBitmap.getWidth(), picBitmap.getHeight(), matrix, true);
             //myCamera.stopPreview();
 
-            picTaken.setImageBitmap(bitmapToDisplay);
+            picTaken.setImageBitmap(image);
 
             myCamera.startPreview();
 
@@ -226,30 +228,34 @@ public class MainActivity extends AppCompatActivity {
         if (location != null) {
             longitude = location.getLongitude();
             latitude = location.getLatitude();
-            try {
-                address = (Address) geocoder.getFromLocation(latitude, longitude, 1).toArray()[0];
-                locality = address.getSubAdminArea();
-                if (locality == null) {
-                    locality = address.getLocality();
-                }
 
-                if (locality == null) {
-                    locality = address.getSubAdminArea();
-                }
-                if (locality == null) {
-                    locality = address.getAddressLine(0);
-                }
-                Toast t = Toast.makeText(getApplicationContext(), locality, Toast.LENGTH_LONG);
-                t.show();
-            } catch (Exception e) {
-                System.out.println(e);
-//            }
-//            longitude = location.getLongitude();
-//            latitude = location.getLatitude();
-//            Toast t = Toast.makeText(getApplicationContext(),
-//                    String.format("long: " + longitude + "\nlat: " + latitude), Toast.LENGTH_LONG);
-//            t.show();
-            }
+
+
+
+        /**
+         * Michael 1/27:
+         * Not needed in the current design of the app, but great functionality for geocoding if
+         * decided to use it. Keep it for now.
+          */
+        //            try {
+        //                address = (Address) geocoder.getFromLocation(latitude, longitude, 1).toArray()[0];
+        //                locality = address.getSubAdminArea();
+        //                if (locality == null) {
+        //                    locality = address.getLocality();
+        //                }
+        //
+        //                if (locality == null) {
+        //                    locality = address.getSubAdminArea();
+        //                }
+        //                if (locality == null) {
+        //                    locality = address.getAddressLine(0);
+        //                }
+        //                Toast t = Toast.makeText(getApplicationContext(), locality, Toast.LENGTH_LONG);
+        //                t.show();
+        //            } catch (Exception e) {
+        //                System.out.println(e);
+        //
+        //            }
         } else {
             Toast t = Toast.makeText(getApplicationContext(), "NO LAST LOCATION", Toast.LENGTH_SHORT);
             t.show();
@@ -260,7 +266,9 @@ public class MainActivity extends AppCompatActivity {
 
     public void getLocation() {//took out View view as input, seemed unnecessary
         locationRequested = true;
-        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        if (locationManager == null) {
+            locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        }
         try {
             Location lastLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
             getLocality(lastLocation);
@@ -271,15 +279,12 @@ public class MainActivity extends AppCompatActivity {
             public void onLocationChanged(Location location) {
                 getLocality(location);
             }
-
             @Override
             public void onProviderDisabled(String provider) {
             }
-
             @Override
             public void onProviderEnabled(String provider) {
             }
-
             @Override
             public void onStatusChanged(String provider, int status, Bundle extras) {
             }
@@ -309,19 +314,16 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void updateNote() {
-        Calendar c = Calendar.getInstance();
-        int d = c.get(Calendar.SECOND);
-        note = new Note("michael", noteBody.getText().toString(),
-                longitude, latitude, ((BitmapDrawable) picTaken.getDrawable()).getBitmap(),
-                d);
-    }
 
     // Set up as a an onclick listener to a 'save' button or something like that.
     // Currently not initiated with anything
     public void sendNote(View view) {
-        //Temporality needed to load the note object from other members
-        updateNote();
+        if (note== null){
+            Log.e(ERROR, "Note not created before saved!");
+            Toast t = Toast.makeText(getApplicationContext(), "Please Make a Note Before Saving",Toast.LENGTH_LONG);
+            t.show();
+            return;
+        }
 
         final String urlText = "http://cs.coloradocollege.edu/~cp341mobile/cgi-bin/notes.cgi";
         final String reqMeth = "POST";
@@ -331,8 +333,6 @@ public class MainActivity extends AppCompatActivity {
 
         ConnectivityManager connMgr = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
         NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
-
-        Log.d(DEBUG, "JSON NOTE:  " + noteJSON);
 
         String[] params = {reqMeth, noteJSON, action, urlText};
         if (networkInfo != null && networkInfo.isConnected()) {
