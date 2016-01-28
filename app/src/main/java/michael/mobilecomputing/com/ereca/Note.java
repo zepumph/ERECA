@@ -46,6 +46,10 @@ public class Note {
     public String getUser() {
         return user;
     }
+    
+    public String setUser(String currentUser) {
+        this.user = currentUser;
+    }
 
     public String getNoteText() {
         return noteText;
