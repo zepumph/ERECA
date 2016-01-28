@@ -24,6 +24,8 @@ public class LoginActivity extends Activity{
     NfcAdapter myAdapter;
     PendingIntent pendingIntent;
     IntentFilter[] intentFiltersArray;
+    Boolean isNewUser = false;
+    String newUser;
 
     String[][] techListsArray;
 
@@ -99,7 +101,20 @@ public class LoginActivity extends Activity{
         Toast t = Toast.makeText(getApplicationContext(),"Message: " + s, Toast.LENGTH_LONG);
         t.show();
 
-
+         //the idea
+         /**
+          * Someone is logged in already
+          * scanning the tag sets the username to someone else (so you don't have to do a full login)
+          * registers their username in the newUser field above
+          * sets the Boolean isNewUser to "true"
+          * a check happens in the final note creation where:
+          * if(isNewUser == true) then <note>.setUser(newUser);
+          * ^^^if we do it this way, then we won't have to worry about changing the original person's username back
+          * the next note will have the original person's username... At least I believe so... **/
+          
+          
     }
+    
+    
 
 }
