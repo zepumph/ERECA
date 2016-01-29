@@ -79,15 +79,14 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 //        geocoder = new Geocoder(getApplicationContext());
 
-        // sets the username from the login NFC activity.
-        setUser();
-
         noteBody = (EditText) findViewById(R.id.et_notepad);
         picTaken = (ImageView) findViewById(R.id.iv_pic_taken);
 
         locationManager = null;
+
+        // Michael: Shouldn't need to get location on start, inserts wierd toast at start if gps not enabled.
         //added in getLocation() to onCreate
-        getLocation();
+        //getLocation();
         //Camera
         if (checkCameraHardware(this)) {
 
@@ -109,11 +108,23 @@ public class MainActivity extends AppCompatActivity {
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
             user = extras.getString("USERNAME");
-        } else {
+        }
+        else {
             user = "Generic, Lame, User.";
         }
     }
 
+    public void switchUser(View view){
+        Intent i = new Intent(this, LoginActivity.class);
+        startActivity(i);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        // sets the username from the login NFC activity.
+        setUser();
+    }
     //ADDED BY JACK ALL CAMERA CODE IS TAKEN FROM THE CAMERA TUTORIAL FROM ANDROID DOCS
     //http://developer.android.com/guide/topics/media/camera.html
     @Override
@@ -244,30 +255,30 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-        /**
-         * Michael 1/27:
-         * Not needed in the current design of the app, but great functionality for geocoding if
-         * decided to use it. Keep it for now.
-          */
-        //            try {
-        //                address = (Address) geocoder.getFromLocation(latitude, longitude, 1).toArray()[0];
-        //                locality = address.getSubAdminArea();
-        //                if (locality == null) {
-        //                    locality = address.getLocality();
-        //                }
-        //
-        //                if (locality == null) {
-        //                    locality = address.getSubAdminArea();
-        //                }
-        //                if (locality == null) {
-        //                    locality = address.getAddressLine(0);
-        //                }
-        //                Toast t = Toast.makeText(getApplicationContext(), locality, Toast.LENGTH_LONG);
-        //                t.show();
-        //            } catch (Exception e) {
-        //                System.out.println(e);
-        //
-        //            }
+            /**
+             * Michael 1/27:
+             * Not needed in the current design of the app, but great functionality for geocoding if
+             * decided to use it. Keep it for now.
+             */
+            //            try {
+            //                address = (Address) geocoder.getFromLocation(latitude, longitude, 1).toArray()[0];
+            //                locality = address.getSubAdminArea();
+            //                if (locality == null) {
+            //                    locality = address.getLocality();
+            //                }
+            //
+            //                if (locality == null) {
+            //                    locality = address.getSubAdminArea();
+            //                }
+            //                if (locality == null) {
+            //                    locality = address.getAddressLine(0);
+            //                }
+            //                Toast t = Toast.makeText(getApplicationContext(), locality, Toast.LENGTH_LONG);
+            //                t.show();
+            //            } catch (Exception e) {
+            //                System.out.println(e);
+            //
+            //            }
         } else {
             Toast t = Toast.makeText(getApplicationContext(), "NO LAST LOCATION", Toast.LENGTH_SHORT);
             t.show();
