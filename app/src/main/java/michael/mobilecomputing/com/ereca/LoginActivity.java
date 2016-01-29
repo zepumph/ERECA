@@ -11,7 +11,10 @@ import android.nfc.Tag;
 import android.nfc.tech.NfcF;
 import android.os.Bundle;
 import android.os.Parcelable;
-import android.widget.TextView;
+import android.text.TextUtils;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Toast;
 
 import java.util.Arrays;
@@ -24,21 +27,22 @@ public class LoginActivity extends Activity{
     NfcAdapter myAdapter;
     PendingIntent pendingIntent;
     IntentFilter[] intentFiltersArray;
-    Boolean isNewUser = false;
-    String newUser;
 
     String[][] techListsArray;
 
-    TextView tv;
+    EditText et_username;
+    Button btn_login;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
+        et_username = (EditText) findViewById(R.id.et_username);
+        btn_login = (Button) findViewById(R.id.btn_login);
+
+
         myAdapter = NfcAdapter.getDefaultAdapter(this);
-
-
         pendingIntent = PendingIntent.getActivity(
                 this, 0, new Intent(this, getClass()).addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP), 0);
 
@@ -54,20 +58,30 @@ public class LoginActivity extends Activity{
         intentFiltersArray = new IntentFilter[] {
                 ndef, td
         };
-
         techListsArray = new String[][] { new String[] { NfcF.class.getName() } };
-
-
     }
-
     public void onPause() {
         super.onPause();
         myAdapter.disableForegroundDispatch(this);
     }
-
     public void onResume() {
         super.onResume();
         myAdapter.enableForegroundDispatch(this, pendingIntent, intentFiltersArray, techListsArray);
+    }
+
+    public void login(View view){
+        String username = et_username.getText().toString();
+        if (username.equals("") || !username.matches("[a-zA-Z0-9. ]*")){
+            Toast t = Toast.makeText(getApplicationContext(), "Please Type in a Valid Username", Toast.LENGTH_LONG);
+            t.show();
+        }
+        else {
+            Intent i = new Intent(getBaseContext(), MainActivity.class);
+            i.putExtra("USERNAME", username);
+            Toast t = Toast.makeText(getApplicationContext(), "Loging in as: " + username, Toast.LENGTH_LONG);
+            t.show();
+            startActivity(i);
+        }
     }
 
     public void onNewIntent(Intent intent) {
@@ -94,16 +108,10 @@ public class LoginActivity extends Activity{
 
             }
         }
-
-        tv = (TextView) findViewById(R.id.texter);
-        tv.setText(s);
-
-        Toast t = Toast.makeText(getApplicationContext(),"Message: " + s, Toast.LENGTH_LONG);
-        t.show();
-
-        Intent i = new Intent(getBaseContext(), MainActivity.class);
-        i.putExtra("USERNAME", s);
-        startActivity(i);
+        // Immediately adds the message gathered from NFC
+        et_username.setText(s);
+        // Launch the same onClick listener that the login button calls.
+        login(btn_login);
 
 
          //the idea

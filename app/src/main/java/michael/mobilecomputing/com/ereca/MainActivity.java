@@ -113,8 +113,7 @@ public class MainActivity extends AppCompatActivity {
         else{
             user = "Generic, Lame, User.";
         }
-        Toast t = Toast.makeText(getApplicationContext(),"USERNAME: " + user, Toast.LENGTH_LONG);
-        t.show();
+
     }
 
 
