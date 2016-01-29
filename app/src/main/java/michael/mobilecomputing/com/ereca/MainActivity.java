@@ -79,9 +79,6 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 //        geocoder = new Geocoder(getApplicationContext());
 
-        // sets the username from the login NFC activity.
-        setUser();
-
         noteBody = (EditText) findViewById(R.id.et_notepad);
         picTaken = (ImageView) findViewById(R.id.iv_pic_taken);
 
@@ -117,7 +114,17 @@ public class MainActivity extends AppCompatActivity {
         t.show();
     }
 
+    public void switchUser(){
+        Intent i = new Intent(this, LoginActivity.class);
+        startActivity(i);
+    }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        // sets the username from the login NFC activity.
+        setUser();
+    }
     //ADDED BY JACK ALL CAMERA CODE IS TAKEN FROM THE CAMERA TUTORIAL FROM ANDROID DOCS
     //http://developer.android.com/guide/topics/media/camera.html
     @Override
