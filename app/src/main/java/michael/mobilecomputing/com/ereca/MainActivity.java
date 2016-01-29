@@ -109,13 +109,10 @@ public class MainActivity extends AppCompatActivity {
         Bundle extras = getIntent().getExtras();
         if (extras != null) {
             user = extras.getString("USERNAME");
-        }
-        else{
+        } else {
             user = "Generic, Lame, User.";
         }
-
     }
-
 
     //ADDED BY JACK ALL CAMERA CODE IS TAKEN FROM THE CAMERA TUTORIAL FROM ANDROID DOCS
     //http://developer.android.com/guide/topics/media/camera.html
