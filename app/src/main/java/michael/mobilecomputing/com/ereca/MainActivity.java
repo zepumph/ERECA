@@ -135,7 +135,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        myCamera.release();
+   //     myCamera.release();
     }
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {

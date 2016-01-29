@@ -1,6 +1,5 @@
 package michael.mobilecomputing.com.ereca;
 
-import android.app.Activity;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.IntentFilter;
@@ -11,7 +10,7 @@ import android.nfc.Tag;
 import android.nfc.tech.NfcF;
 import android.os.Bundle;
 import android.os.Parcelable;
-import android.text.TextUtils;
+import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -22,7 +21,7 @@ import java.util.Arrays;
 /**
  * Created by Michael on 1/27/2016.
  */
-public class LoginActivity extends Activity{
+public class LoginActivity extends AppCompatActivity {
 
     NfcAdapter myAdapter;
     PendingIntent pendingIntent;
@@ -78,7 +77,7 @@ public class LoginActivity extends Activity{
         else {
             Intent i = new Intent(getBaseContext(), MainActivity.class);
             i.putExtra("USERNAME", username);
-            Toast t = Toast.makeText(getApplicationContext(), "Loging in as: " + username, Toast.LENGTH_LONG);
+            Toast t = Toast.makeText(getApplicationContext(), "Loging in as: " + username, Toast.LENGTH_SHORT);
             t.show();
             startActivity(i);
         }
