@@ -11,8 +11,10 @@
     tools:context="mobilecomputing.com.ereca.MainActivity"
     android:orientation="vertical">
 
-    <FrameLayout android:id="@+id/preview"
-        android:layout_weight="1" android:layout_width="1px"
+    <FrameLayout
+        android:id="@+id/preview"
+        android:layout_weight="1"
+        android:layout_width="1px"
         android:layout_height="1px">
 
     </FrameLayout>
@@ -20,7 +22,7 @@
     <ImageView
         android:id="@+id/iv_pic_taken"
         android:layout_width="wrap_content"
-        android:layout_height="30dp" />
+        android:layout_height="100dp" />
 
     <EditText
         android:id="@+id/et_notepad"

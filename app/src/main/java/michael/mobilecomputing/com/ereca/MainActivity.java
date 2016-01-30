@@ -9,8 +9,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.hardware.Camera;
-import android.location.Address;
-import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -43,48 +41,68 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 
 public class MainActivity extends AppCompatActivity {
 
+    // Constants
     private static final int SPEECH_INPUT_ID = 3500;
     private static final int TAKE_PICTURE_ID = 3501;
     private static final String DEBUG = "DEBUG";
     private static final String ERROR = "ERROR";
-    private Camera myCamera = null;
-    private Preview preview;
     public static final int MEDIA_TYPE_IMAGE = 1;
 
 
-
-    Bitmap image;
-    String locality;
-    File pictureFile;
-    EditText noteBody;
-    ImageView picTaken;
-    LocationManager locationManager;
-    double longitude;
-    double latitude;
-    boolean locationRequested = false;
-    //Address address;
-    Geocoder geocoder;
-
+    /**
+     * note holds all data fields needed
+     * These are added to one instance variable as they are created dynamically.
+     * The note object is the reset to null values once a note is sent.
+     */
     Note note;
+    // Will need to be changes to something better eventually.
+    String user = "testUser";
+
+    // View variables
+    ImageView picTaken;
+    EditText noteText;
+
+    // Camera instance variables
+    File pictureFile;
+    Preview preview;
+    private Camera myCamera = null;
+
+
+
+    // Location instance variables
+    LocationManager locationManager;
+    boolean locationRequested = false;
+
+
+    // Used for the locality functionality
+    //Address address;
+//    Geocoder geocoder;
+    //    String locality;
+
+
 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        geocoder = new Geocoder(getApplicationContext());
 
+        note = new Note();
 
-        noteBody = (EditText) findViewById(R.id.et_notepad);
+        noteText = (EditText) findViewById(R.id.et_notepad);
         picTaken = (ImageView) findViewById(R.id.iv_pic_taken);
 
         locationManager = null;
-        //added in getLocation() to onCreate
+//        geocoder = new Geocoder(getApplicationContext());
+
         getLocation();
+
+
         //Camera
         if (checkCameraHardware(this)) {
 
@@ -102,17 +120,18 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
+
     //ADDED BY JACK ALL CAMERA CODE IS TAKEN FROM THE CAMERA TUTORIAL FROM ANDROID DOCS
     //http://developer.android.com/guide/topics/media/camera.html
     @Override
     protected void onStop() {
         super.onStop();
-        //myCamera.release();
+//        myCamera.release();
     }
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        myCamera.release();
+//        myCamera.release();
     }
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
@@ -128,11 +147,6 @@ public class MainActivity extends AppCompatActivity {
                 if (action == KeyEvent.ACTION_DOWN) {
                     takePicture();
                     insertSpeech();
-                    Toast t = Toast.makeText(getApplicationContext(), "latitude" + String.valueOf(latitude) + " " + "Longitude" + String.valueOf(longitude), Toast.LENGTH_LONG);
-                    t.show();
-                    Date date = new Date();
-                    //new note stores all info on new note
-                    note = new Note("testUser", noteBody.getText().toString(), longitude, latitude, image, (int)date.getTime());
                 }
                 return true;
             default:
@@ -178,9 +192,10 @@ public class MainActivity extends AppCompatActivity {
             Bitmap picBitmap = BitmapFactory.decodeFile(pictureFile.getPath());
             Matrix matrix = new Matrix();
             matrix.postRotate(90);
-            image = Bitmap.createBitmap(picBitmap , 0, 0, picBitmap.getWidth(), picBitmap.getHeight(), matrix, true);
-            //myCamera.stopPreview();
+            Bitmap image = Bitmap.createBitmap(picBitmap , 0, 0, picBitmap.getWidth(), picBitmap.getHeight(), matrix, true);
 
+            //myCamera.stopPreview();
+            note.setImage(image);
             picTaken.setImageBitmap(image);
 
             myCamera.startPreview();
@@ -226,8 +241,8 @@ public class MainActivity extends AppCompatActivity {
 
     private void getLocality(Location location) {
         if (location != null) {
-            longitude = location.getLongitude();
-            latitude = location.getLatitude();
+            note.setLon(location.getLongitude());
+            note.setLat(location.getLatitude());
 
 
 
@@ -300,11 +315,10 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        Toast t = Toast.makeText(getApplicationContext(), "HJelkfd", Toast.LENGTH_LONG);
-        t.show();
         if (requestCode == SPEECH_INPUT_ID && resultCode == RESULT_OK) {
             ArrayList<String> outputList = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
-            noteBody.append(" " + outputList.get(0));
+
+            noteText.append(" " + outputList.get(0));
         } else if (requestCode == TAKE_PICTURE_ID && resultCode == RESULT_OK) {
             Bundle extras = data.getExtras();
             String fileName = extras.getString("FILE_PATH");
@@ -314,21 +328,44 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    public void setNote(){
+
+        // Set the note text
+        note.setNoteText(noteText.getText().toString());
+
+        // Set the date before sending it
+        Calendar c = Calendar.getInstance();
+        note.setDate( c.getTime().getTime());
+
+        // Set the user.
+        note.setUser(user);
+
+
+        // Set the location
+        getLocation();
+
+    }
 
     // Set up as a an onclick listener to a 'save' button or something like that.
     // Currently not initiated with anything
     public void sendNote(View view) {
-        if (note== null){
+        final String urlText = "http://cs.coloradocollege.edu/~cp341mobile/cgi-bin/notes_test_for_michael.cgi";
+        final String reqMeth = "POST";
+        final String action = "addNote";
+
+        // set most of the note fields at once
+        setNote();
+
+        // This statement implies that all notes will have text in them. . . or else.
+        if (note.getNoteText()== null){
             Log.e(ERROR, "Note not created before saved!");
             Toast t = Toast.makeText(getApplicationContext(), "Please Make a Note Before Saving",Toast.LENGTH_LONG);
             t.show();
             return;
         }
 
-        final String urlText = "http://cs.coloradocollege.edu/~cp341mobile/cgi-bin/notes.cgi";
-        final String reqMeth = "POST";
+        // Make a json representation of the Note object
         final String noteJSON = note.jsonify();
-        final String action = "addNote";
 
 
         ConnectivityManager connMgr = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -376,8 +413,9 @@ public class MainActivity extends AppCompatActivity {
         // onPostExecute displays the results of the AsyncTask.
         @Override
         protected void onPostExecute(String result) {
-            Toast t = Toast.makeText(getApplicationContext(), result, Toast.LENGTH_LONG);
-            t.show();
+            EditText et_messageText = (EditText) findViewById(R.id.et_notepad);
+            et_messageText.setText(result);
+            note = new Note();
         }
 
 

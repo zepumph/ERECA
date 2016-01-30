@@ -31,9 +31,17 @@ public class Note {
     private double lon;
     private double lat;
     private Bitmap image;
-    private int date;
+    private long date;
 
 
+    public Note(){
+        this.user = null;
+        this.noteText = null;
+        this.lon = 0;
+        this.lat = 0;
+        this.image = null;
+        this.date = 0;
+    }
     public Note(String user, String noteText, double lon, double lat, Bitmap image, int date) {
         this.user = user;
         this.noteText = noteText;
@@ -63,15 +71,38 @@ public class Note {
         return image;
     }
 
-    public int getDate() {
+    public long getDate() {
         return date;
     }
 
+    public void setUser(String user) {
+        this.user = user;
+    }
 
+    public void setNoteText(String noteText) {
+        this.noteText = noteText;
+    }
+
+    public void setLon(double lon) {
+        this.lon = lon;
+    }
+
+    public void setLat(double lat) {
+        this.lat = lat;
+    }
+
+    public void setImage(Bitmap image) {
+        this.image = image;
+    }
+
+    public void setDate(long date) {
+        this.date = date;
+    }
 
     //Creates a json of the file
     public String jsonify(){
         try{
+            Log.d(DEBUG, "Bitmap Image: " + image );
             JSONObject json = new JSONObject();
             json = putValue(json, "user", user);
             json = putValue(json, "noteText", noteText);
