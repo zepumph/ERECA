@@ -70,7 +70,7 @@ public class LoginActivity extends AppCompatActivity {
 
     public void login(View view){
         String username = et_username.getText().toString();
-        if (username.equals("") || !username.matches("[a-zA-Z0-9. ]*")){
+        if (username.equals("") || !username.matches("[a-zA-Z0-9.!? ]*")){
             Toast t = Toast.makeText(getApplicationContext(), "Please Type in a Valid Username", Toast.LENGTH_LONG);
             t.show();
         }

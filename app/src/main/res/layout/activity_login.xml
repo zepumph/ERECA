@@ -24,7 +24,7 @@
         android:textColor="@color/colorPrimary"
         android:textSize="20sp"
         android:gravity="center"/>
-    
+
     <EditText
         android:id="@+id/et_username"
         android:layout_width="match_parent"
