@@ -1,7 +1,5 @@
 package michael.mobilecomputing.com.ereca;
 
-
-
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -18,10 +16,18 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.speech.RecognizerIntent;
+import android.support.design.widget.NavigationView;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -44,7 +50,10 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
-public class MainActivity extends AppCompatActivity {
+import michael.mobilecomputing.com.ereca.gridviewer.GridViewActivity;
+
+public class Main2Activity extends AppCompatActivity
+        implements NavigationView.OnNavigationItemSelectedListener {
 
     // Constants
     private static final int SPEECH_INPUT_ID = 3500;
@@ -52,7 +61,7 @@ public class MainActivity extends AppCompatActivity {
     private static final String DEBUG = "DEBUG";
     private static final String ERROR = "ERROR";
     public static final int MEDIA_TYPE_IMAGE = 1;
-
+    private static final int GO_TO_GALLERY = 344;
 
     /**
      * note holds all data fields needed
@@ -65,7 +74,7 @@ public class MainActivity extends AppCompatActivity {
 
     // View variables
     ImageView picTaken;
-    EditText noteText;
+    EditText noteBody;
 
     // Camera instance variables
     File pictureFile;
@@ -86,15 +95,28 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        overridePendingTransition(R.anim.fadein, R.anim.fadeout);
 
+        /* set up nav bar */
+        setContentView(R.layout.activity_main2);
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.setDrawerListener(toggle);
+        toggle.syncState();
+
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
+
+        /* init global vars + constants */
         note = new Note();
 
-        noteText = (EditText) findViewById(R.id.et_notepad);
+        noteBody = (EditText) findViewById(R.id.et_notepad);
         picTaken = (ImageView) findViewById(R.id.iv_pic_taken);
 
         locationManager = null;
@@ -103,7 +125,20 @@ public class MainActivity extends AppCompatActivity {
         getLocation();
 
 
+        //initCamera();
+        //camera is initialized on in onStart()
+
+
+
+    }
+
+    /**
+     * Access the camera and assign in to the variable myCamera
+     *      This should be called in onCreate and onResume
+     */
+    private void initCamera(){
         //Camera
+        //checks if there is a cam
         if (checkCameraHardware(this)) {
 
             try {
@@ -113,6 +148,11 @@ public class MainActivity extends AppCompatActivity {
                 myCamera.setDisplayOrientation(90);
                 preview = new Preview(this, myCamera);
                 FrameLayout cameraPreview = (FrameLayout) findViewById(R.id.preview);
+
+                /* added by Xander in to remove camera release error
+                * empties the layout so the old preview doesn't raise hell
+                * */
+                cameraPreview.removeAllViews();
                 cameraPreview.addView(preview);
                 System.out.println("camera opened");
             } catch (Exception e) {
@@ -121,18 +161,12 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    //ADDED BY JACK ALL CAMERA CODE IS TAKEN FROM THE CAMERA TUTORIAL FROM ANDROID DOCS
-    //http://developer.android.com/guide/topics/media/camera.html
-    @Override
-    protected void onStop() {
-        super.onStop();
-//        myCamera.release();
+    private void hideKeyboard(){
+//        InputMethodManager inputMethodManager = (InputMethodManager)  this.getSystemService(this.INPUT_METHOD_SERVICE);
+//        inputMethodManager.hideSoftInputFromWindow(this.getCurrentFocus().getWindowToken(), 0);
     }
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-//        myCamera.release();
-    }
+
+    /* called upon key presses while in this activity */
     @Override
     public boolean dispatchKeyEvent(KeyEvent event) {
         int action = event.getAction();
@@ -153,6 +187,63 @@ public class MainActivity extends AppCompatActivity {
                 return super.dispatchKeyEvent(event);
         }
     }
+
+    @Override
+    public void onBackPressed() {
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        if (drawer.isDrawerOpen(GravityCompat.START)) {
+            drawer.closeDrawer(GravityCompat.START);
+        } else {
+            super.onBackPressed();
+        }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.main2, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Handle action bar item clicks here. The action bar will
+        // automatically handle clicks on the Home/Up button, so long
+        // as you specify a parent activity in AndroidManifest.xml.
+        int id = item.getItemId();
+
+        //noinspection SimplifiableIfStatement
+        if (id == R.id.action_settings) {
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
+    @SuppressWarnings("StatementWithEmptyBody")
+    @Override
+    public boolean onNavigationItemSelected(MenuItem item) {
+        // Handle navigation view item clicks here.
+        int id = item.getItemId();
+
+        if (id == R.id.nav_camera) {
+            // Handle the camera action
+        } else if (id == R.id.nav_gallery) {
+            /* go the the grid view */
+            Intent goToGallery = new Intent(this, GridViewActivity.class);
+            startActivityForResult(goToGallery, GO_TO_GALLERY );
+        } else if (id == R.id.nav_notes) {
+
+        } else if (id == R.id.nav_manage) {
+
+        }
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawer.closeDrawer(GravityCompat.START);
+        return true;
+    }
+
+
+
 
     private boolean checkCameraHardware(Context context) {
         if (context.getPackageManager().hasSystemFeature(
@@ -247,30 +338,30 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-        /**
-         * Michael 1/27:
-         * Not needed in the current design of the app, but great functionality for geocoding if
-         * decided to use it. Keep it for now.
-          */
-        //            try {
-        //                address = (Address) geocoder.getFromLocation(latitude, longitude, 1).toArray()[0];
-        //                locality = address.getSubAdminArea();
-        //                if (locality == null) {
-        //                    locality = address.getLocality();
-        //                }
-        //
-        //                if (locality == null) {
-        //                    locality = address.getSubAdminArea();
-        //                }
-        //                if (locality == null) {
-        //                    locality = address.getAddressLine(0);
-        //                }
-        //                Toast t = Toast.makeText(getApplicationContext(), locality, Toast.LENGTH_LONG);
-        //                t.show();
-        //            } catch (Exception e) {
-        //                System.out.println(e);
-        //
-        //            }
+            /**
+             * Michael 1/27:
+             * Not needed in the current design of the app, but great functionality for geocoding if
+             * decided to use it. Keep it for now.
+             */
+            //            try {
+            //                address = (Address) geocoder.getFromLocation(latitude, longitude, 1).toArray()[0];
+            //                locality = address.getSubAdminArea();
+            //                if (locality == null) {
+            //                    locality = address.getLocality();
+            //                }
+            //
+            //                if (locality == null) {
+            //                    locality = address.getSubAdminArea();
+            //                }
+            //                if (locality == null) {
+            //                    locality = address.getAddressLine(0);
+            //                }
+            //                Toast t = Toast.makeText(getApplicationContext(), locality, Toast.LENGTH_LONG);
+            //                t.show();
+            //            } catch (Exception e) {
+            //                System.out.println(e);
+            //
+            //            }
         } else {
             Toast t = Toast.makeText(getApplicationContext(), "NO LAST LOCATION", Toast.LENGTH_SHORT);
             t.show();
@@ -318,20 +409,22 @@ public class MainActivity extends AppCompatActivity {
         if (requestCode == SPEECH_INPUT_ID && resultCode == RESULT_OK) {
             ArrayList<String> outputList = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
 
-            noteText.append(" " + outputList.get(0));
+            noteBody.append(" " + outputList.get(0));
         } else if (requestCode == TAKE_PICTURE_ID && resultCode == RESULT_OK) {
             Bundle extras = data.getExtras();
             String fileName = extras.getString("FILE_PATH");
             System.out.println(fileName);
             Bitmap bitmapToDisplayFromSDCard = BitmapFactory.decodeFile(fileName);
             picTaken.setImageBitmap(bitmapToDisplayFromSDCard);
+        } else if (requestCode == GO_TO_GALLERY){
+
         }
     }
 
     public void setNote(){
 
         // Set the note text
-        note.setNoteText(noteText.getText().toString());
+        note.setNoteText(noteBody.getText().toString());
 
         // Set the date before sending it
         Calendar c = Calendar.getInstance();
@@ -397,7 +490,7 @@ public class MainActivity extends AppCompatActivity {
      * 3  the URL of the cgi script, no query params needed
      */
     class HTTPHelper extends AsyncTask<String, Void, String> {
-        private static final String DEBUG = "DEBUG";
+        //private static final String DEBUG = "DEBUG";
 
         @Override
         protected String doInBackground(String... params) {
@@ -482,4 +575,28 @@ public class MainActivity extends AppCompatActivity {
             return s;
         }
     }
-}
+
+    /* release camera when navigating away from the activity
+     */
+    @Override
+    protected void onStop() {
+        super.onStop();
+        myCamera.release();
+        myCamera = null;
+        preview = null;
+    }
+
+    /* re-initialize camera
+     */
+    @Override
+    public void onStart() {
+        super.onStart();
+        initCamera();
+
+    }
+
+
+
+
+
+    }

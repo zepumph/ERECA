@@ -7,4 +7,10 @@
     <string name="take_picture">Take Picture</string>
     <string name="btn_save">Save</string>
     <string name="title_activity_camera">CameraActivity</string>
+    <string name="desc">This badddddassss fade doe!</string>
+    <string name="title_activity_main2">Main2Activity</string>
+
+    <string name="navigation_drawer_open">Open navigation drawer</string>
+    <string name="navigation_drawer_close">Close navigation drawer</string>
+    <string name="default_text">what you said</string>
 </resources>
