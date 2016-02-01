@@ -52,7 +52,7 @@ import java.util.Date;
 
 import michael.mobilecomputing.com.ereca.gridviewer.GridViewActivity;
 
-public class Main2Activity extends AppCompatActivity
+public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
 
     // Constants

@@ -36,8 +36,8 @@ public class SplashScreenActivity extends Activity{
                 image.startAnimation(animationFadeOut);
 
                 /* start the next activity */
-               // Intent transition = new Intent(SplashScreenActivity.this, Main2Activity.class);
-                Intent transition = new Intent(SplashScreenActivity.this, Main2Activity.class);
+               // Intent transition = new Intent(SplashScreenActivity.this, MainActivity.class);
+                Intent transition = new Intent(SplashScreenActivity.this, MainActivity.class);
                 SplashScreenActivity.this.startActivity(transition);
                 SplashScreenActivity.this.finish();
             }
