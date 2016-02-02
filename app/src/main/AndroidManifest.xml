@@ -36,9 +36,6 @@
             android:windowSoftInputMode="stateHidden" />
         <activity android:name=".gridviewer.GridViewActivity" />
         <activity
-            android:name=".LoginActivity"
-            android:label="@string/title_activity_login" />
-        <activity
             android:name=".DetailAcvitity"
             android:label="@string/title_activity_detail_acvitity"
             android:theme="@style/Theme.AppCompat" />
@@ -57,7 +54,10 @@
 
         <activity
             android:name=".MapsFragment"
-            android:label="@string/title_activity_maps_fragment"></activity>
+            android:label="@string/title_activity_maps_fragment" />
+        <activity
+            android:name=".LoginActivity"
+            android:label="@string/title_activity_login"></activity>
     </application>
 
 </manifest>
