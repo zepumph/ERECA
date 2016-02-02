@@ -1,5 +1,6 @@
 package michael.mobilecomputing.com.ereca;
 
+import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -63,6 +64,12 @@ public class MainActivity extends AppCompatActivity
     public static final int MEDIA_TYPE_IMAGE = 1;
     private static final int GO_TO_GALLERY = 344;
 
+    private static final String[] LOCATION_PERMS={
+            Manifest.permission.ACCESS_FINE_LOCATION
+    };
+    private static final int INITIAL_REQUEST=1337;
+
+
     /**
      * note holds all data fields needed
      * These are added to one instance variable as they are created dynamically.
@@ -93,6 +100,9 @@ public class MainActivity extends AppCompatActivity
 //    Geocoder geocoder;
     //    String locality;
 
+    private boolean hasPermission(String perm) {
+        return(PackageManager.PERMISSION_GRANTED==checkSelfPermission(perm));
+    }
 
 
     @Override
@@ -380,6 +390,9 @@ public class MainActivity extends AppCompatActivity
             getLocality(lastLocation);
         } catch (SecurityException e) {
             System.out.print(e);
+            if (!hasPermission(Manifest.permission.ACCESS_FINE_LOCATION)) {
+                requestPermissions(LOCATION_PERMS, INITIAL_REQUEST);
+            }
         }
         LocationListener locationListener = new LocationListener() {
             public void onLocationChanged(Location location) {
@@ -581,7 +594,9 @@ public class MainActivity extends AppCompatActivity
     @Override
     protected void onStop() {
         super.onStop();
-        myCamera.release();
+        if(myCamera != null){
+            myCamera.release();
+        }
         myCamera = null;
         preview = null;
     }
