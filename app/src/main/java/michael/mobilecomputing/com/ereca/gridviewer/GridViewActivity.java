@@ -3,12 +3,11 @@ package michael.mobilecomputing.com.ereca.gridviewer;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
-import android.support.design.widget.NavigationView;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.AdapterView;
@@ -16,6 +15,9 @@ import android.widget.GridView;
 import android.widget.LinearLayout;
 import android.widget.Toast;
 
+import java.io.ByteArrayOutputStream;
+
+import michael.mobilecomputing.com.ereca.DetailAcvitity;
 import michael.mobilecomputing.com.ereca.R;
 import pl.polidea.view.ZoomView;
 
@@ -52,10 +54,18 @@ public class GridViewActivity extends Activity {
         /* Grid View */
         gridview = (GridView) findViewById(R.id.gridview);
         gridview.setAdapter(new ImageAdapter(this));
+        final Intent detailIntent = new Intent(this, DetailAcvitity.class);
+        Bitmap icon = BitmapFactory.decodeResource(this.getResources(),
+                R.drawable.sample_2);
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        icon.compress(Bitmap.CompressFormat.PNG, 100, stream);
+        byte[] byteArray = stream.toByteArray();
 
+        detailIntent.putExtra("image", byteArray);
         gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View v,
                                     int position, long id) {
+                startActivity(detailIntent);
                 Toast.makeText(GridViewActivity.this, "" + position,
                         Toast.LENGTH_SHORT).show();
                 //gridview.setColumnWidth(gridview.getColumnWidth()+5);
