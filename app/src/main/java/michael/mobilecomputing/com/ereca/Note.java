@@ -2,6 +2,7 @@ package michael.mobilecomputing.com.ereca;
 
 import android.graphics.Bitmap;
 import android.os.Debug;
+import android.util.Base64;
 import android.util.Log;
 
 import org.json.JSONException;
@@ -126,17 +127,19 @@ public class Note {
         else {
             // Load the json with bytes of the img to be stored.
             if( value instanceof Bitmap){
-                byte[] bytes = bitMapToByteArray((Bitmap)value);
-                return json.put(field, bytes);
+                String encodedImage = bitMapToBase64((Bitmap) value);
+                return json.put(field, encodedImage);
 
             }
             return json.put(field, value);
         }
     }
 
-    public byte[] bitMapToByteArray(Bitmap bmp){
+    public String bitMapToBase64(Bitmap bmp){
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
         bmp.compress(Bitmap.CompressFormat.PNG, 100, stream);
-        return stream.toByteArray();
+        byte[] tempArray = stream.toByteArray();
+        String encodedImage = Base64.encodeToString(tempArray, Base64.DEFAULT);
+        return encodedImage;
     }
 }
