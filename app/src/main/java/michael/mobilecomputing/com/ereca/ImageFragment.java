@@ -9,6 +9,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -25,9 +26,13 @@ public class ImageFragment extends Fragment {
      * The fragment argument representing the section number for this
      * fragment.
      */
+    private TextView noteTextView;
+    private TextView locationTextView;
     private static final String ARG_SECTION_NUMBER = "section_number";
     private static String noteString;
     private static Bitmap bitmap;
+    private static FrameLayout textViewLayout;
+    private static FrameLayout parentFrameLayout;
     //    public ImageFragment(String noteString) {
 //        this.noteString = noteString;
 //    }
@@ -52,10 +57,29 @@ public class ImageFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_image, container, false);
-        TextView textView = (TextView) rootView.findViewById(R.id.note);
-        textView.setText(noteString);
+        noteTextView = (TextView) rootView.findViewById(R.id.note);
+        noteTextView.setText(noteString);
+        locationTextView = (TextView) rootView.findViewById(R.id.location);
+        locationTextView.setText("LOCATION TEXT");
         ImageView imageView = (ImageView) rootView.findViewById(R.id.imageView);
-        imageView.setImageBitmap(bitmap);
+        imageView.setImageResource(R.drawable.sample_5);
+        textViewLayout = (FrameLayout) rootView.findViewById(R.id.textViewFrame);
+        textViewLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (textViewLayout.getVisibility() == View.VISIBLE)
+                    textViewLayout.setVisibility(View.INVISIBLE);
+            }
+        });
+        parentFrameLayout = (FrameLayout) rootView.findViewById(R.id.parentFrameLayout);
+        parentFrameLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (textViewLayout.getVisibility() == View.INVISIBLE)
+                    textViewLayout.setVisibility(View.VISIBLE);
+            }
+        });
+        //imageView.setImageBitmap(bitmap);
         return rootView;
     }
 }

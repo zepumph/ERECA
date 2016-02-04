@@ -14,8 +14,7 @@ import com.google.android.gms.maps.model.Marker;
 public class MapsFragment extends SupportMapFragment implements
         OnMapReadyCallback {
 
-    private final LatLng HAMBURG = new LatLng(53.558, 9.927);
-    private final LatLng KIEL = new LatLng(53.551, 9.993);
+    private final LatLng CC = new LatLng(38.847045, -104.824827);
 
     private static final String ARG_SECTION_NUMBER = "section_number";
 
@@ -55,18 +54,14 @@ public class MapsFragment extends SupportMapFragment implements
         map.setMapType(GoogleMap.MAP_TYPE_HYBRID);
         map.getUiSettings().setMapToolbarEnabled(false);
         map.getUiSettings().setScrollGesturesEnabled(false);
-        Marker hamburg = map.addMarker(new MarkerOptions().position(HAMBURG)
-                .title(locationNameString));
-        Marker kiel = map.addMarker(new MarkerOptions()
-                .position(KIEL)
+        Marker cc = map.addMarker(new MarkerOptions()
+                .position(CC)
                 .title(locationNameString)
-                .snippet(locationNameString + locationNameString)
-                .icon(BitmapDescriptorFactory
-                        .fromResource(R.mipmap.ic_launcher)));
-        kiel.showInfoWindow();
-        map.moveCamera(CameraUpdateFactory.newLatLngZoom(HAMBURG, 15));
+                .snippet(locationNameString + locationNameString));
+        cc.showInfoWindow();
+        map.moveCamera(CameraUpdateFactory.newLatLngZoom(CC, 15));
 
-        map.animateCamera(CameraUpdateFactory.zoomTo(10), 2000, null);
+        map.animateCamera(CameraUpdateFactory.zoomTo(20), 2000, null);
 
     }
 

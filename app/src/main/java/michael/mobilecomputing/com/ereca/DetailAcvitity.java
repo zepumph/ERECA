@@ -46,9 +46,8 @@ public class DetailAcvitity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail_acvitity);
-        byte[] byteArray = getIntent().getByteArrayExtra("image");
-        bitmapToDisplay = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.length);
-
+//        byte[] byteArray = getIntent().getByteArrayExtra("image");
+//        bitmapToDisplay = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.length);
         //setSupportActionBar(toolbar);
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
@@ -57,16 +56,6 @@ public class DetailAcvitity extends AppCompatActivity {
         // Set up the ViewPager with the sections adapter.
         mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
-
-
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
 
     }
 
