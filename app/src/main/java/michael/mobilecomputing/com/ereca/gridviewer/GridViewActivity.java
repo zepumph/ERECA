@@ -29,6 +29,23 @@ public class GridViewActivity extends Activity {
     ZoomView zoomView;
     LinearLayout main_container;
 
+    //Moved from
+    // references to our images
+    private Integer[] mThumbIds = {
+            R.drawable.sample_2, R.drawable.sample_3,
+            R.drawable.sample_4, R.drawable.sample_5,
+            R.drawable.sample_6, R.drawable.sample_7,
+            R.drawable.sample_0, R.drawable.sample_1,
+            R.drawable.sample_2, R.drawable.sample_3,
+            R.drawable.sample_4, R.drawable.sample_5,
+            R.drawable.sample_6, R.drawable.sample_7,
+            R.drawable.sample_0, R.drawable.sample_1,
+            R.drawable.sample_2, R.drawable.sample_3,
+            R.drawable.sample_4, R.drawable.sample_5,
+            R.drawable.sample_6, R.drawable.sample_7
+    };
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,7 +70,7 @@ public class GridViewActivity extends Activity {
 
         /* Grid View */
         gridview = (GridView) findViewById(R.id.gridview);
-        gridview.setAdapter(new ImageAdapter(this));
+        gridview.setAdapter(new ImageAdapter(this,mThumbIds));
         final Intent detailIntent = new Intent(this, DetailAcvitity.class);
         Bitmap icon = BitmapFactory.decodeResource(this.getResources(),
                 R.drawable.sample_2);

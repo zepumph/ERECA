@@ -1,12 +1,17 @@
 package michael.mobilecomputing.com.ereca.gridviewer;
 
 import android.content.Context;
+import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+
+import java.lang.reflect.Array;
+import java.util.ArrayList;
 
 import michael.mobilecomputing.com.ereca.R;
 
@@ -15,9 +20,10 @@ import michael.mobilecomputing.com.ereca.R;
  */
 public class ImageAdapter extends BaseAdapter {
     private Context mContext;
-
-    public ImageAdapter(Context c) {
+    Integer[] mThumbIds;
+    public ImageAdapter(Context c, Integer[] imageArray) {
         mContext = c;
+        mThumbIds = imageArray;
     }
 
     public int getCount() {
@@ -68,19 +74,6 @@ public class ImageAdapter extends BaseAdapter {
 
     }
 
-    // references to our images
-    private Integer[] mThumbIds = {
-            R.drawable.sample_2, R.drawable.sample_3,
-            R.drawable.sample_4, R.drawable.sample_5,
-            R.drawable.sample_6, R.drawable.sample_7,
-            R.drawable.sample_0, R.drawable.sample_1,
-            R.drawable.sample_2, R.drawable.sample_3,
-            R.drawable.sample_4, R.drawable.sample_5,
-            R.drawable.sample_6, R.drawable.sample_7,
-            R.drawable.sample_0, R.drawable.sample_1,
-            R.drawable.sample_2, R.drawable.sample_3,
-            R.drawable.sample_4, R.drawable.sample_5,
-            R.drawable.sample_6, R.drawable.sample_7
-    };
+
 
 }
