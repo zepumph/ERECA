@@ -25,6 +25,7 @@ public class ImageAdapter extends BaseAdapter {
     private Context mContext;
     //Integer[] mThumbIds;
     ArrayList<LinearLayout> notes;
+    ArrayList<Note> note_objects;
 
 
     //public ImageAdapter(Context c, Integer[] imageArray) {
@@ -32,6 +33,7 @@ public class ImageAdapter extends BaseAdapter {
         mContext = c;
         //mThumbIds = imageArray;
         notes = new ArrayList<>();
+        note_objects = new ArrayList<>();
         //registerDataSetObserver(new MyDataSetObserver());
     }
 
@@ -44,6 +46,7 @@ public class ImageAdapter extends BaseAdapter {
     public void addNote(LinearLayout note){
         notes.add(note);
     }
+
 
     public void addNote(Note note){
         /* inflate a note view */
@@ -69,6 +72,9 @@ public class ImageAdapter extends BaseAdapter {
         /* set the note text */
         textView = (TextView) note_view.getChildAt(1);
         textView.setText(note.getNoteText());
+
+        /* add to note object so the detail activity can access them */
+        note_objects.add(note);
 
         /* adds the note to the gridview should be called at the end
         *   be aware that the note will note be displayed until gridView.invalidateViews() is called */

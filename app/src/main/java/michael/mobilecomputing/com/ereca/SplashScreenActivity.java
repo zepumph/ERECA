@@ -41,7 +41,8 @@ public class SplashScreenActivity extends Activity{
                 SplashScreenActivity.this.startActivity(transition);
                 SplashScreenActivity.this.finish();
             }
-        }, 600);
+        }, 100);
+
 
     }
 

@@ -1,5 +1,6 @@
 package michael.mobilecomputing.com.ereca;
 
+import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Debug;
@@ -205,8 +206,17 @@ public class Note {
     }
     /* reverse of bitMapToBase64(Bitmap bmp) */
     public static Bitmap base64ToBitMap( String base64 ){
-        byte[] data = Base64.decode(base64, Base64.DEFAULT);
-        Bitmap bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
+        Bitmap bmp = null;
+
+        /* try to decode the data, if  not return stock bitmap */
+        try {
+            byte[] data = Base64.decode(base64, Base64.DEFAULT);
+            bmp = BitmapFactory.decodeByteArray(data, 0, data.length);
+        } catch (IllegalArgumentException e ){
+            return BitmapFactory.decodeResource(Resources.getSystem(), R.drawable.sample_0 );
+        }
+
+
         return bmp;
     }
 
