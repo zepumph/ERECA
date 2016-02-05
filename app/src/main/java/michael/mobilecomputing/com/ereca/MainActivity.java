@@ -458,7 +458,7 @@ public class MainActivity extends AppCompatActivity
     // Set up as a an onclick listener to a 'save' button or something like that.
     // Currently not initiated with anything
     public void sendNote(View view) {
-        final String urlText = "http://cs.coloradocollege.edu/~cp341mobile/cgi-bin/notes_test_for_michael.cgi";
+        final String urlText = "http://cs.coloradocollege.edu/~cp341mobile/cgi-bin/notes.cgi";
         final String reqMeth = "POST";
         final String action = "addNote";
 
