@@ -59,8 +59,8 @@ public class MainActivity extends AppCompatActivity
     // Constants
     private static final int SPEECH_INPUT_ID = 3500;
     private static final int TAKE_PICTURE_ID = 3501;
-    private static final String DEBUG = "DEBUG";
-    private static final String ERROR = "ERROR";
+    public static final String DEBUG = "DEBUG";
+    public static final String ERROR = "ERROR";
     public static final int MEDIA_TYPE_IMAGE = 1;
     private static final int GO_TO_GALLERY = 344;
 
@@ -507,6 +507,7 @@ public class MainActivity extends AppCompatActivity
      */
     class HTTPHelper extends AsyncTask<String, Void, String> {
         //private static final String DEBUG = "DEBUG";
+
 
         @Override
         protected String doInBackground(String... params) {
