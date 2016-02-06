@@ -25,7 +25,7 @@ import android.widget.TextView;
 
 import java.io.FileInputStream;
 
-public class DetailAcvitity extends AppCompatActivity {
+public class DetailActivity extends AppCompatActivity {
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide

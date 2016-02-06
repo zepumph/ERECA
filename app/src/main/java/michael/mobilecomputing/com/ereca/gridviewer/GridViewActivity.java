@@ -18,7 +18,7 @@ import android.widget.Toast;
 
 import java.io.ByteArrayOutputStream;
 
-import michael.mobilecomputing.com.ereca.DetailAcvitity;
+import michael.mobilecomputing.com.ereca.DetailActivity;
 import michael.mobilecomputing.com.ereca.http.AsyncResponse;
 import michael.mobilecomputing.com.ereca.Note;
 import michael.mobilecomputing.com.ereca.R;
@@ -55,15 +55,10 @@ public class GridViewActivity extends Activity implements AsyncResponse {
         main_container = (LinearLayout) findViewById(R.id.main_container);
         main_container.addView(zoomView);
 
-//        /* nav bar */
-//        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-//        navigationView.setNavigationItemSelectedListener(GridViewActivity.this);
-
-
         /* Grid View */
         gridview = (GridView) findViewById(R.id.gridview);
         gridview.setAdapter(imageAdapter = new ImageAdapter(this));
-        final Intent detailIntent = new Intent(this, DetailAcvitity.class);
+        final Intent detailIntent = new Intent(this, DetailActivity.class);
         Bitmap icon = BitmapFactory.decodeResource(this.getResources(),
                 R.drawable.sample_2);
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
@@ -74,6 +69,8 @@ public class GridViewActivity extends Activity implements AsyncResponse {
         gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View v,
                                     int position, long id) {
+
+                /* start an activity to view the note up close */
                 startActivity(detailIntent);
                 Toast.makeText(GridViewActivity.this, "" + position,
                         Toast.LENGTH_SHORT).show();
@@ -82,15 +79,16 @@ public class GridViewActivity extends Activity implements AsyncResponse {
         });
 
         //getNote(null);
-        testAddNote();
+        getNotesFromServer();
     }
+
 
     // Set up as a an onclick listener to a 'save' button or something like that.
     // Currently not initiated with anything
-    public void getNote(View view) {
+    public void getNote(View view, String noteID) {
         final String urlText = "http://cs.coloradocollege.edu/~cp341mobile/cgi-bin/notes.cgi";
         final String reqMeth = "GET";
-        final String action = "getNote&user=testUser";
+        final String action = "getNote&user=testUser&noteId=" + noteID;
 
 
         ConnectivityManager connMgr = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -108,15 +106,28 @@ public class GridViewActivity extends Activity implements AsyncResponse {
         }
     }
 
+    /* get the list of notesids and then use another async task to get them from the server */
+    public void getNotesFromServer(){
+        final String urlText = "http://cs.coloradocollege.edu/~cp341mobile/cgi-bin/notes.cgi";
+        final String reqMeth = "GET";
+        final String action = "getNoteIDs&user=testUser";
 
 
-    private void testAddNote(){
-        getNote(null);
-        //gridview.invalidateViews();
+        ConnectivityManager connMgr = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+
+        String[] params = {reqMeth, "", action, urlText};
+        if (networkInfo != null && networkInfo.isConnected()) {
+            HttpHelper httpHelper = new HttpHelper();
+            httpHelper.delegate = new GetListResponse( this );
+            httpHelper.execute(params);
+
+        } else {
+            Toast t = Toast.makeText(getApplicationContext(), "No network connection", Toast.LENGTH_LONG);
+            t.show();
+        }
+
     }
-
-
-
 
     @Override
     public void onBackPressed() {
@@ -132,13 +143,16 @@ public class GridViewActivity extends Activity implements AsyncResponse {
     /*
     This is the callback for when the http get request finishes adding a note to the grid view.
      */
-
     @Override
     public void processFinish(String result) {
         /* add the note to the imageAdapter */
         Note note = Note.createFromJson(result);
         imageAdapter.addNote(note);
         gridview.invalidateViews();
+
+        Toast addedNote = Toast.makeText(this, "Added a note to the grid!", Toast.LENGTH_SHORT);
+        addedNote.show();
+
     }
 }
 

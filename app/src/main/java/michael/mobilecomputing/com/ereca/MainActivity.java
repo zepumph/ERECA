@@ -159,6 +159,11 @@ public class MainActivity extends AppCompatActivity
             try {
                 myCamera = Camera.open();
                 Camera.Parameters params = myCamera.getParameters();
+
+                /* set the quality of the jpeg from 0 to 100 */
+                /* added by xander to combat outofmemory errors */
+                params.setJpegQuality(10);
+
                 myCamera.setParameters(params);
                 myCamera.setDisplayOrientation(90);
                 preview = new Preview(this, myCamera);
@@ -277,6 +282,7 @@ public class MainActivity extends AppCompatActivity
             Log.d("onPictureTaken", "entering picture callback");
 
             pictureFile = getOutputMediaFile(MEDIA_TYPE_IMAGE);
+
             if (pictureFile == null){
                 Log.d("onPictureTaken", "Error creating media file, check storage permissions: ");
                 return;
@@ -295,11 +301,17 @@ public class MainActivity extends AppCompatActivity
                 Log.d("onPictureTaken", "Error accessing file: " + e.getMessage());
             }
             //picTaken.refreshDrawableState();
-            Bitmap picBitmap = BitmapFactory.decodeFile(pictureFile.getPath());
+
+            /* select options on how to decode the file */
+            BitmapFactory.Options btmOptions = new BitmapFactory.Options();
+            btmOptions.inPreferQualityOverSpeed = false;
+            btmOptions.inSampleSize = 3;
+
+            Bitmap picBitmap = BitmapFactory.decodeFile(pictureFile.getPath(), btmOptions);
             Matrix matrix = new Matrix();
             matrix.postRotate(90);
             Bitmap image = Bitmap.createBitmap(picBitmap , 0, 0, picBitmap.getWidth(), picBitmap.getHeight(), matrix, true);
-
+            //Bitmap image = Bitmap.createBitmap(picBitmap , 0, 0, 100, 100, matrix, true);
             //myCamera.stopPreview();
             note.setImage(image);
             picTaken.setImageBitmap(image);
@@ -429,11 +441,13 @@ public class MainActivity extends AppCompatActivity
 
             noteBody.append(" " + outputList.get(0));
         } else if (requestCode == TAKE_PICTURE_ID && resultCode == RESULT_OK) {
+
             Bundle extras = data.getExtras();
             String fileName = extras.getString("FILE_PATH");
             System.out.println(fileName);
-            Bitmap bitmapToDisplayFromSDCard = BitmapFactory.decodeFile(fileName);
-            picTaken.setImageBitmap(bitmapToDisplayFromSDCard);
+            //Bitmap bitmapToDisplayFromSDCard = BitmapFactory.decodeFile(fileName);
+            //picTaken.setImageBitmap(bitmapToDisplayFromSDCard);
+
         } else if (requestCode == GO_TO_GALLERY){
 
         }

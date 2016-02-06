@@ -36,7 +36,7 @@
             android:windowSoftInputMode="stateHidden" />
         <activity android:name=".gridviewer.GridViewActivity" />
         <activity
-            android:name=".DetailAcvitity"
+            android:name=".DetailActivity"
             android:label="@string/title_activity_detail_acvitity"
             android:theme="@style/Theme.AppCompat" />
 

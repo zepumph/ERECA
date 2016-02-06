@@ -126,7 +126,7 @@ public class Note {
             json = putValue(json, KEY_IMAGE, image);
             json = putValue(json, KEY_DATE, date);
 
-            Log.d(DEBUG, "JSONED Item: " + json.toString() );
+            Log.d(DEBUG, "JSONED Item (1st 500 chars): " + json.toString().substring(0, 500) );
             return json.toString();
         }catch(JSONException e){
             Log.e(ERROR, "JSON exception: " + e.getMessage(), e);
