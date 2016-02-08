@@ -3,7 +3,6 @@ package michael.mobilecomputing.com.ereca;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.os.Debug;
 import android.util.Base64;
 import android.util.Log;
 
@@ -33,10 +32,10 @@ public class Note {
 
     /* global key values added by xander so there's no confusion */
     private static final String KEY_USER = "user";
-    private static final String KEY_NOTETEXT = "noteText";
+    private static final String KEY_NOTE_TEXT = "noteText";
     private static final String KEY_LAT = "lat";
     private static final String KEY_LON = "lon";
-    private final String KEY_IMAGE = "image";
+    private static final String KEY_IMAGE = "image";
     private static final String KEY_DATE = "date";
 
 
@@ -120,11 +119,12 @@ public class Note {
             Log.d(DEBUG, "Bitmap Image: " + image );
             JSONObject json = new JSONObject();
             json = putValue(json, KEY_USER, user);
-            json = putValue(json, KEY_NOTETEXT, noteText);
+            json = putValue(json, KEY_NOTE_TEXT, noteText);
             json = putValue(json, KEY_LAT, lat);
             json = putValue(json, KEY_LON, lon);
-            json = putValue(json, KEY_IMAGE, image);
             json = putValue(json, KEY_DATE, date);
+            json = putValue(json, KEY_IMAGE, image);
+
 
             Log.d(DEBUG, "JSONED Item (1st 500 chars): " + json.toString().substring(0, 500) );
             return json.toString();
@@ -155,10 +155,14 @@ public class Note {
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
         bmp.compress(Bitmap.CompressFormat.PNG, 100, stream);
         byte[] tempArray = stream.toByteArray();
+        printByteArray();
         String encodedImage = Base64.encodeToString(tempArray, Base64.DEFAULT);
         return encodedImage;
     }
 
+    private void printByteArray() {
+
+    }
 
 
 //
@@ -190,7 +194,7 @@ public class Note {
 
         /* try to get info from note */
         try {
-            output.setNoteText(content.get(KEY_NOTETEXT));
+            output.setNoteText(content.get(KEY_NOTE_TEXT));
             output.setUser(content.get(KEY_USER));
             output.setDate(Long.parseLong( content.get(KEY_DATE) ));
             output.setLat(Double.parseDouble( content.get(KEY_LAT) ));

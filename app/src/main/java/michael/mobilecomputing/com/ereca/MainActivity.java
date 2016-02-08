@@ -512,8 +512,8 @@ public class MainActivity extends AppCompatActivity
      */
     @Override
     public void processFinish(String result) {
-        EditText et_messageText = (EditText) findViewById(R.id.et_notepad);
-        et_messageText.setText(result);
+        Toast t = Toast.makeText(getApplicationContext(), "Successfully Saved Your Note", Toast.LENGTH_LONG);
+        t.show();
         note = new Note();
     }
 
