@@ -2,6 +2,7 @@ package michael.mobilecomputing.com.ereca;
 
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.os.Bundle;
@@ -43,10 +44,11 @@ public class ImageFragment extends Fragment {
      * Returns a new instance of this fragment for the given section
      * number.
      */
-    public static ImageFragment newInstance(int sectionNumber, String note, Bitmap bitmapInput) {
+    public static ImageFragment newInstance(int sectionNumber, String note) {
         //if (sectionNumber == 0) {
         noteString = note;
-        bitmap = bitmapInput;
+        bitmap = BitmapFactory.decodeFile("/sdcard/" + "detailImage" + ".png");
+
         ImageFragment fragment = new ImageFragment();
         Bundle args = new Bundle();
         args.putInt(ARG_SECTION_NUMBER, sectionNumber);
@@ -57,12 +59,13 @@ public class ImageFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_image, container, false);
+
         noteTextView = (TextView) rootView.findViewById(R.id.note);
-        noteTextView.setText(noteString);
-        locationTextView = (TextView) rootView.findViewById(R.id.location);
-        locationTextView.setText("LOCATION TEXT");
+        if (noteString != null)
+            noteTextView.setText(noteString);
         ImageView imageView = (ImageView) rootView.findViewById(R.id.imageView);
-        imageView.setImageResource(R.drawable.sample_5);
+        if (bitmap != null)
+            imageView.setImageBitmap(bitmap);
         textViewLayout = (FrameLayout) rootView.findViewById(R.id.textViewFrame);
         textViewLayout.setOnClickListener(new View.OnClickListener() {
             @Override

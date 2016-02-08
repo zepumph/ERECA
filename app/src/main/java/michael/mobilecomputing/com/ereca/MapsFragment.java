@@ -1,5 +1,6 @@
 package michael.mobilecomputing.com.ereca;
 
+import android.os.Bundle;
 import android.util.Log;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 
@@ -11,16 +12,18 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.maps.model.Marker;
 
+import java.util.regex.Pattern;
+
 public class MapsFragment extends SupportMapFragment implements
         OnMapReadyCallback {
 
-    private final LatLng CC = new LatLng(38.847045, -104.824827);
-
+    private String lat;
+    private String lon;
+    private Note noteToDisplay;
     private static final String ARG_SECTION_NUMBER = "section_number";
 
     private GoogleMap map;
     private Marker marker;
-    private String locationNameString = "MORTAL KOMBAT";
     public MapsFragment() {
         //locationNameString = name;
     }
@@ -29,37 +32,39 @@ public class MapsFragment extends SupportMapFragment implements
     public void onResume() {
         super.onResume();
 
-        Log.d("MyMap", "onResume");
         setUpMapIfNeeded();
     }
 
     private void setUpMapIfNeeded() {
 
         if (map == null) {
-
-            Log.d("MyMap", "setUpMapIfNeeded");
-
             getMapAsync(this);
         }
     }
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
-        Log.d("MyMap", "onMapReady");
+        Bundle bundle = getArguments();
+        String latLonString = bundle.getString("noteLatLon");
+        String[] latLon = latLonString.split(Pattern.quote("|"));
+        lat = latLon[0];
+        lon = latLon[1];
         map = googleMap;
-        setUpMap();
+        if (lat != null && lon != null)
+            setUpMap();
     }
 
     private void setUpMap() {
         map.setMapType(GoogleMap.MAP_TYPE_HYBRID);
         map.getUiSettings().setMapToolbarEnabled(false);
         map.getUiSettings().setScrollGesturesEnabled(false);
+        LatLng latLng = new LatLng(new Double(lat),new Double(lon));
         Marker cc = map.addMarker(new MarkerOptions()
-                .position(CC)
-                .title(locationNameString)
-                .snippet(locationNameString + locationNameString));
+                .position(latLng)
+                .title("")
+                .snippet(""));
         cc.showInfoWindow();
-        map.moveCamera(CameraUpdateFactory.newLatLngZoom(CC, 15));
+        map.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
 
         map.animateCamera(CameraUpdateFactory.zoomTo(20), 2000, null);
 

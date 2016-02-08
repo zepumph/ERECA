@@ -18,7 +18,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:adjustViewBounds="true"
-            android:scaleType="centerInside"
+            android:scaleType="fitXY"
             android:id="@+id/imageView"
             />
         <FrameLayout
@@ -43,19 +43,19 @@
                     android:layout_height="wrap_content"
 
                     android:layout_gravity="bottom"
-                    android:paddingBottom="20dp"
+                    android:paddingBottom="0dp"
                     android:textColor="#d3d3d3"
                     android:textAppearance="?android:attr/textAppearanceMedium" />
 
 
-                <TextView
-                    android:id="@+id/location"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="bottom"
-                    android:text="Washington DC"
-                    android:textColor="#d3d3d3"
-                    android:textAppearance="?android:attr/textAppearanceMedium" />
+                <!--<TextView-->
+                    <!--android:id="@+id/location"-->
+                    <!--android:layout_width="wrap_content"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:layout_gravity="bottom"-->
+                    <!--android:text="Washington DC"-->
+                    <!--android:textColor="#d3d3d3"-->
+                    <!--android:textAppearance="?android:attr/textAppearanceMedium" />-->
             </FrameLayout>
 
         </FrameLayout>

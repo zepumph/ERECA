@@ -24,6 +24,8 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import java.io.FileInputStream;
+import java.util.ArrayList;
+import java.util.regex.Pattern;
 
 public class DetailActivity extends AppCompatActivity {
 
@@ -37,20 +39,19 @@ public class DetailActivity extends AppCompatActivity {
      */
     private SectionsPagerAdapter mSectionsPagerAdapter;
     private  Bitmap bitmapToDisplay;
+    private Note note;
     /**
      * The {@link ViewPager} that will host the section contents.
      */
     private ViewPager mViewPager;
-
+    String[] noteDetailArray;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_detail_acvitity);
-//        byte[] byteArray = getIntent().getByteArrayExtra("image");
-//        bitmapToDisplay = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.length);
-        //setSupportActionBar(toolbar);
-        // Create the adapter that will return a fragment for each of the three
-        // primary sections of the activity.
+        Intent intent = getIntent();
+        String noteString = intent.getStringExtra("noteString");
+        noteDetailArray = noteString.split(Pattern.quote("|"));
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
         // Set up the ViewPager with the sections adapter.
@@ -132,10 +133,14 @@ public class DetailActivity extends AppCompatActivity {
             // getItem is called to instantiate the fragment for the given page.
             // Return a PlaceholderFragment (defined as a static inner class below).
             if (position == 0) {
-                return ImageFragment.newInstance(position + 1, "NOTE TEXT", bitmapToDisplay);
+                return ImageFragment.newInstance(position + 1, noteDetailArray[0]);
             }
             else {
-                return new MapsFragment();
+                Bundle bundle = new Bundle();
+                bundle.putString("noteLatLon", noteDetailArray[1] + "|" + noteDetailArray[2]);
+                MapsFragment mapsFragment = new MapsFragment();
+                mapsFragment.setArguments(bundle);
+                return mapsFragment;
             }
         }
 

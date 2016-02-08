@@ -82,7 +82,8 @@ public class ImageAdapter extends BaseAdapter {
     }
 
     public Object getItem(int position) {
-        return null;
+
+        return note_objects.get(position);
     }
 
     public long getItemId(int position) {

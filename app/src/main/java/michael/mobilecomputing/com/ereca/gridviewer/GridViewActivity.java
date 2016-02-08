@@ -8,6 +8,7 @@ import android.graphics.BitmapFactory;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
@@ -17,6 +18,8 @@ import android.widget.LinearLayout;
 import android.widget.Toast;
 
 import java.io.ByteArrayOutputStream;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 
 import michael.mobilecomputing.com.ereca.DetailActivity;
 import michael.mobilecomputing.com.ereca.http.AsyncResponse;
@@ -43,7 +46,6 @@ public class GridViewActivity extends Activity implements AsyncResponse {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.grid_view);
 
-
         /* from xander's code */
         /* Zoom View */
         View v = ((LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE)).inflate(R.layout.zoomable_view, null, false);
@@ -59,18 +61,17 @@ public class GridViewActivity extends Activity implements AsyncResponse {
         gridview = (GridView) findViewById(R.id.gridview);
         gridview.setAdapter(imageAdapter = new ImageAdapter(this));
         final Intent detailIntent = new Intent(this, DetailActivity.class);
-        Bitmap icon = BitmapFactory.decodeResource(this.getResources(),
-                R.drawable.sample_2);
-        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        icon.compress(Bitmap.CompressFormat.PNG, 100, stream);
-        byte[] byteArray = stream.toByteArray();
-
-        detailIntent.putExtra("image", byteArray);
         gridview.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View v,
                                     int position, long id) {
 
                 /* start an activity to view the note up close */
+                Note noteToDisplay = (Note) imageAdapter.getItem(position);
+                String filePath = "/sdcard/" + "detailImage" + ".png";
+                saveBitmap(noteToDisplay.getImage(),filePath);
+                String noteString = noteToDisplay.getNoteText()+"|"+noteToDisplay.getLatitude()+"|"+noteToDisplay.getLongitude();
+
+                detailIntent.putExtra("noteString", noteString);
                 startActivity(detailIntent);
                 Toast.makeText(GridViewActivity.this, "" + position,
                         Toast.LENGTH_SHORT).show();
@@ -129,6 +130,19 @@ public class GridViewActivity extends Activity implements AsyncResponse {
 
     }
 
+    private boolean saveBitmap(Bitmap bitmapInput, String filePath) {
+        try {
+            FileOutputStream stream = new FileOutputStream(filePath);
+            bitmapInput.compress(Bitmap.CompressFormat.PNG, 40, stream);
+            //Don't we want to do all saving at one time
+            //dbHelper.updateRow("image", filePath, uuid);
+            return true;
+
+        } catch (FileNotFoundException e) {
+            System.out.print(e);
+            return false;
+        }
+    }
     @Override
     public void onBackPressed() {
         GridViewActivity.this.finish();
