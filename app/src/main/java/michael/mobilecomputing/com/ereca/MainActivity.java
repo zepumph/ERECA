@@ -13,7 +13,6 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.speech.RecognizerIntent;
@@ -28,24 +27,16 @@ import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.Toast;
 
-import java.io.DataOutputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.io.UnsupportedEncodingException;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -83,7 +74,8 @@ public class MainActivity extends AppCompatActivity
 
     // View variables
     ImageView picTaken;
-    EditText noteBody;
+    EditText noteText;
+    Button saveBtn;
 
     // Camera instance variables
     File pictureFile;
@@ -131,8 +123,10 @@ public class MainActivity extends AppCompatActivity
         /* init global vars + constants */
         note = new Note();
 
-        noteBody = (EditText) findViewById(R.id.et_notepad);
+        noteText = (EditText) findViewById(R.id.et_notepad);
         picTaken = (ImageView) findViewById(R.id.iv_pic_taken);
+        saveBtn = (Button) findViewById(R.id.btn_save);
+
 
         locationManager = null;
 //        geocoder = new Geocoder(getApplicationContext());
@@ -439,7 +433,7 @@ public class MainActivity extends AppCompatActivity
         if (requestCode == SPEECH_INPUT_ID && resultCode == RESULT_OK) {
             ArrayList<String> outputList = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
 
-            noteBody.append(" " + outputList.get(0));
+            noteText.append(" " + outputList.get(0));
         } else if (requestCode == TAKE_PICTURE_ID && resultCode == RESULT_OK) {
 
             Bundle extras = data.getExtras();
@@ -456,7 +450,7 @@ public class MainActivity extends AppCompatActivity
     public void setNote(){
 
         // Set the note text
-        note.setNoteText(noteBody.getText().toString());
+        note.setNoteText(noteText.getText().toString());
 
         // Set the date before sending it
         Calendar c = Calendar.getInstance();
@@ -489,6 +483,7 @@ public class MainActivity extends AppCompatActivity
             return;
         }
 
+        saveBtn.setEnabled(false);
         // Make a json representation of the Note object
         final String noteJSON = note.jsonify();
 
@@ -514,7 +509,20 @@ public class MainActivity extends AppCompatActivity
     public void processFinish(String result) {
         Toast t = Toast.makeText(getApplicationContext(), "Successfully Saved Your Note", Toast.LENGTH_LONG);
         t.show();
+
+        refreshNoteLayout();
+
+    }
+
+    private void refreshNoteLayout() {
+        // Create a new note that is to be filled with more information
         note = new Note();
+        // Reset fields
+        picTaken.setImageDrawable(null);
+        noteText.setText("");
+        // Allow the save button to be pressed again
+        saveBtn.setEnabled(true);
+
     }
 
     /* release camera when navigating away from the activity

@@ -10,8 +10,13 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Locale;
+import java.util.SimpleTimeZone;
 
 
 /**
@@ -196,12 +201,18 @@ public class Note {
         try {
             output.setNoteText(content.get(KEY_NOTE_TEXT));
             output.setUser(content.get(KEY_USER));
-            output.setDate(Long.parseLong( content.get(KEY_DATE) ));
-            output.setLat(Double.parseDouble( content.get(KEY_LAT) ));
-            output.setLon(Double.parseDouble( content.get(KEY_LON) ));
+            output.setLat(Double.parseDouble(content.get(KEY_LAT)));
+            output.setLon(Double.parseDouble(content.get(KEY_LON)));
+            SimpleDateFormat f = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss", Locale.US);
+            Date d = f.parse(content.get(KEY_DATE));
+            long millisecond = d.getTime();
+            output.setDate(millisecond);
+            output.setDate(Long.parseLong(content.get(KEY_DATE)));
         } catch (NumberFormatException e) {
             e.printStackTrace();
         } catch (NullPointerException e){
+            e.printStackTrace();
+        } catch (ParseException e) {
             e.printStackTrace();
         }
 
@@ -210,7 +221,7 @@ public class Note {
     }
     /* reverse of bitMapToBase64(Bitmap bmp) */
     public static Bitmap base64ToBitMap( String base64 ){
-        Bitmap bmp = null;
+        Bitmap bmp;
 
         /* try to decode the data, if  not return stock bitmap */
         try {
