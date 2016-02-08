@@ -390,7 +390,7 @@ public class MainActivity extends AppCompatActivity
             //
             //            }
         } else {
-            Toast t = Toast.makeText(getApplicationContext(), "NO LAST LOCATION", Toast.LENGTH_SHORT);
+            Toast t = Toast.makeText(getApplicationContext(), "No Location stored, is your GPS on?", Toast.LENGTH_SHORT);
             t.show();
 
         }
@@ -481,9 +481,9 @@ public class MainActivity extends AppCompatActivity
         // set most of the note fields at once
         setNote();
 
-        // This statement implies that all notes will have text in them. . . or else.
-        if (note.getNoteText()== null){
-            Log.e(ERROR, "Note not created before saved!");
+        // This statement implies that all notes will have text and a picture in them. . . or else.
+        if (note.getNoteText()== null || note.getNoteText().equals("") || note.getImage() ==null){
+            Log.e(ERROR, "Note not fully created before saved!");
             Toast t = Toast.makeText(getApplicationContext(), "Please Make a Note Before Saving",Toast.LENGTH_LONG);
             t.show();
             return;
