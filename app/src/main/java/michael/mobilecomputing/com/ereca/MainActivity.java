@@ -4,6 +4,11 @@ import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.database.sqlite.SQLiteCursorDriver;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteException;
+import android.database.sqlite.SQLiteQuery;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
@@ -36,11 +41,14 @@ import android.widget.Toast;
 
 import java.io.DataOutputStream;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Reader;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
@@ -65,6 +73,10 @@ public class MainActivity extends AppCompatActivity
     public static final String ERROR = "ERROR";
     public static final int MEDIA_TYPE_IMAGE = 1;
     private static final int GO_TO_GALLERY = 344;
+    private ArrayList<Note> notes = new ArrayList<Note>();
+    private String filename = "notesDB";
+    public File file;
+    //public Context context = this;
 
     private static final String[] LOCATION_PERMS={
             Manifest.permission.ACCESS_FINE_LOCATION
@@ -125,8 +137,9 @@ public class MainActivity extends AppCompatActivity
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
+        file = new File(getApplicationContext().getFilesDir(), filename);
 
-
+        //serialize file
 
         /* init global vars + constants */
         note = new Note();
@@ -469,6 +482,7 @@ public class MainActivity extends AppCompatActivity
         // Set the location
         getLocation();
 
+        notes.add(note);
     }
 
     // Set up as a an onclick listener to a 'save' button or something like that.
@@ -538,8 +552,42 @@ public class MainActivity extends AppCompatActivity
 
     }
 
+    //connect to database
+    //get notes for user
+    //serialize to file
 
+    public void serializeToFile(File filename){
+        try {
+            FileOutputStream fos= new FileOutputStream(filename);
+            ObjectOutputStream oos= new ObjectOutputStream(fos);
+            oos.writeObject(notes);
+            oos.close();
+            fos.close();
+        }catch(IOException ioe){
+            ioe.printStackTrace();
+        }
+    }
 
+    //@SuppressWarnings("unchecked")
+    public void deserializeFromFile(File filename) {
+        try {
+            FileInputStream fin = new FileInputStream(filename);
+            ObjectInputStream ois = new ObjectInputStream(fin);
+            notes = (ArrayList<Note>) ois.readObject();
+            ois.close();
+            fin.close();
+        }catch(IOException ioe){
+            ioe.printStackTrace();
+        }catch(ClassNotFoundException ce){
+            ce.printStackTrace();
+        }
+    }
 
+    public void findOrCreateFile(File filename) {
+
+    }
+    //take picture
+    //add to arraylist
+    //serialize arraylist we take
 
     }
