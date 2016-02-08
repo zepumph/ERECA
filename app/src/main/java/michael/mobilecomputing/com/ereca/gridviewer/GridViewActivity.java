@@ -73,8 +73,8 @@ public class GridViewActivity extends Activity implements AsyncResponse {
 
                 detailIntent.putExtra("noteString", noteString);
                 startActivity(detailIntent);
-                Toast.makeText(GridViewActivity.this, "" + position,
-                        Toast.LENGTH_SHORT).show();
+//                Toast.makeText(GridViewActivity.this, "" + position,
+//                        Toast.LENGTH_SHORT).show();
                 //gridview.setColumnWidth(gridview.getColumnWidth()+5);
             }
         });
