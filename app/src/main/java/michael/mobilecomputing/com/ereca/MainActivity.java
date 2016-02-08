@@ -240,15 +240,10 @@ public class MainActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_camera) {
-            // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
+         if (id == R.id.nav_gallery) {
             /* go the the grid view */
             Intent goToGallery = new Intent(this, GridViewActivity.class);
             startActivityForResult(goToGallery, GO_TO_GALLERY );
-        } else if (id == R.id.nav_notes) {
-
-        } else if (id == R.id.nav_manage) {
 
         }
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
