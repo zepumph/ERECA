@@ -2,7 +2,10 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:id="@+id/note_view">
+    android:id="@+id/note_view"
+    android:padding="10dp"
+
+    android:background="@drawable/note_view_border">
     <ImageView
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
@@ -14,6 +17,7 @@
         android:layout_weight="3"
         android:layout_width="fill_parent"
         android:layout_height="fill_parent"
+        android:textColor="@color/colorPrimaryLight"
         android:text="@string/default_text"
         android:textAlignment="center"/>
 

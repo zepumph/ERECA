@@ -64,7 +64,7 @@ public class ImageAdapter extends BaseAdapter {
         /* set true if you want imageview to adjust its bounds to preserve aspect ratio of its drawable */
         imageView.setAdjustViewBounds(true);
 
-        imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
+//        imageView.setScaleType(ImageView.ScaleType.CENTER_CROP);
         imageView.setPadding(8, 8, 8, 8);
 
         imageView.setImageBitmap(note.getImage());

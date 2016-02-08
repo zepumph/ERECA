@@ -10,6 +10,8 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -199,7 +201,7 @@ public class Note {
 
         /* try to get info from note */
         try {
-            output.setNoteText(content.get(KEY_NOTE_TEXT));
+            output.setNoteText(URLDecoder.decode(content.get(KEY_NOTE_TEXT), "UTF-8"));
             output.setUser(content.get(KEY_USER));
             output.setLat(Double.parseDouble(content.get(KEY_LAT)));
             output.setLon(Double.parseDouble(content.get(KEY_LON)));
@@ -213,6 +215,8 @@ public class Note {
         } catch (NullPointerException e){
             e.printStackTrace();
         } catch (ParseException e) {
+            e.printStackTrace();
+        }catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
 
